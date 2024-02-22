@@ -1,6 +1,7 @@
 import { callList } from "src/models/listCall"
 import { Request, Response } from "express"
 import { users } from "src/models/users"
+import { permissionUser } from "./controllerUsers"
 
 interface Call {
     id: number,
@@ -54,12 +55,6 @@ const updateStatus = ( callId: number, newStatus: 'pendente' | 'concluido' | 'em
 
     if (callUpdate) callUpdate.status = newStatus
     else return
-}
-
-const permissionUser = (userId: number): boolean => {
-    const checkUser = users.find(user => user.id === userId)
-
-    return checkUser?.isAdmin ? true : false
 }
 
 export { getAllCalls, setCall, updateStatus, routerUpdate }

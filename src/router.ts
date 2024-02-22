@@ -1,12 +1,12 @@
 import express from "express"
-import { callList } from './models/listCall'
+import { getAllCalls, setCall } from "./controller/call"
 
-const router = express.Router()
+const app = express()
 
-router.get('/', (req, res) => res.send(callList))
-router.post('/setCall', (req, res) => {
-    const called = req.body
-    console.log(called)
-})
+app.use(express.json())
 
-export default router
+app.get('/', getAllCalls)
+
+app.post('/setCall', setCall)
+
+export { app }

@@ -1,9 +1,7 @@
-import express from "express"
-import router from "./router"
+import cors from "cors"
 import "./models/listCall"
+import { app } from "./router"
 
-const app = express()
-
-app.use(router)
+// app.use(cors)
 
 app.listen(3000, () => console.log('Server running...'))

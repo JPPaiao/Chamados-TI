@@ -1,4 +1,4 @@
-interface Calls {
+interface Call {
     id: number,
     name: string,
     sector: string
@@ -9,7 +9,7 @@ interface Calls {
     status: 'pendente' | 'concluido' | 'em análise'
 }
 
-const callList: Calls[] = [
+const callList: Call[] = [
     {
         id: 1,
         name: 'Jp',

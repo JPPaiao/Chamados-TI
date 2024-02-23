@@ -24,11 +24,17 @@ const setUser = (req: Request, res: Response) => {
 
 const updateUser = (req: Request, res: Response) => {
     const userId: number = req.body.id
-    const userUpdate = users.find((user: User) => user.id === userId)
+    const userUpdate: any = users.find((user: User) => user.id === userId)
 
-    // if (userUpdate) {
-    //     const 
-    // }
+    if (userUpdate) {
+        const update: any = req.body.updates
+        
+        Object.keys(update).map((key: string): void => {
+            if (typeof key !== "boolean" || typeof key !== "number") {
+                userUpdate[key] = update[key]
+            }
+        })
+    }
 }
 
 const deleteUser = (req: Request, res: Response): void => {

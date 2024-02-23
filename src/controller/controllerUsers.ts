@@ -26,18 +26,18 @@ const updateUser = (req: Request, res: Response) => {
     const userId: number = req.body.id
     const userUpdate = users.find((user: User) => user.id === userId)
 
-    if (userUpdate) {
-        const 
-    }
+    // if (userUpdate) {
+    //     const 
+    // }
 }
 
 const deleteUser = (req: Request, res: Response): void => {
     const userId: number = req.body.id
     const deletedUser: number = users.findIndex((user: User) => user.id === userId);
 
-    // if (deleteUser !== -1) {
-    //     users.splice(deleteUser, 1)
-    // }
+    if (deletedUser !== -1) {
+        users.splice(deletedUser, 1)
+    }
 
     res.status(200).json({ response: "test" })
 }

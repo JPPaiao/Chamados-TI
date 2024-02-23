@@ -16,6 +16,13 @@ const permissionUser = (userId: number): boolean => {
     return checkUser?.isAdmin ? true : false
 }
 
+const getUsers = (req: Request, res: Response) => {
+    const userId = req.body.id
+    
+    if (permissionUser(userId)) res.status(200).json(users)
+    else res.status(200).json({ response: "Usuário sem permissão" })
+}
+
 const setUser = (req: Request, res: Response) => {
     const createUser: User = req.body.user
 
@@ -32,9 +39,12 @@ const updateUser = (req: Request, res: Response) => {
         Object.keys(update).map((key: string): void => {
             if (typeof key !== "boolean" || typeof key !== "number") {
                 userUpdate[key] = update[key]
+                
+                res.status(200).json({ response: "Usuário atualizado com sucesso" })
             }
         })
     }
+    res.status(200).json({ response: "Usuário não encontrado" })
 }
 
 const deleteUser = (req: Request, res: Response): void => {
@@ -43,9 +53,11 @@ const deleteUser = (req: Request, res: Response): void => {
 
     if (deletedUser !== -1) {
         users.splice(deletedUser, 1)
+        res.status(200).json({ response: "Usuário deletado com sucesso" })
+    } else {
+        res.status(200).json({ response: "Usuário não encontrado" })
     }
 
-    res.status(200).json({ response: "test" })
 }
 
-export { permissionUser, setUser, updateUser, deleteUser }
+export { permissionUser, setUser, updateUser, deleteUser, getUsers }

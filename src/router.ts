@@ -10,7 +10,7 @@ app.get('/', getAllCalls)
 app.post('/call/set', setCall)
 app.put('/call/updateStatus', routerUpdate)
 
-app.get('/user/Users', getUsers)
+app.post('/user/users', getUsers)
 app.post('/user/set', setUser)
 app.put('/user/update', updateUser)
 app.delete('/user/delete', deleteUser)

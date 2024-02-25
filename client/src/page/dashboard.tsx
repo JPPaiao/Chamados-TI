@@ -29,7 +29,7 @@ function Dashboard() {
   }, [])
 
 	return (
-		<div>
+		<div className="h-full">
 			<Header />
       <div className="flex gap-6">
         <SideBar />

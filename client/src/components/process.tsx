@@ -44,8 +44,9 @@ function Process() {
 	const [openCards, setOpenCards] = useState<boolean[]>(Array(process.length).fill(false))
 	const [newProcess, setNewProcess] = useState<string>()
 
-	const toggleAddProcess = () => {
-		// setProcess([])
+	const toggleAddProcess = (e: any) => {
+		e.preventDefault()
+		if (newProcess) setProcess([...process,{ title: newProcess, description: 'lorem'}])
 	}
 
   const toggleCard = (index: number) => {
@@ -56,11 +57,11 @@ function Process() {
 
 	return (
 		<div className="flex gap-4 px-6 py-4 flex-wrap items-center justify-center">
-			<form className="flex justify-around w-full text-base">
+			<form className="flex justify-around w-full text-base" onSubmit={(e) => toggleAddProcess(e)}>
 				<input onChange={(e) => setNewProcess(e.target.value)} type="text" placeholder="Título" className="px-2 outline-none border-b-2 border-green-800" />
-				<input onClick={() => toggleAddProcess()} type="button" value="Adicionar processo" className="px-3 cursor-pointer hover:bg-green-800 hover:text-white transition-all shadow-md border-green-800 border-2 bg-green-50" />
+				<input type="submit" value="Adicionar processo" className="px-3 cursor-pointer hover:bg-green-800 hover:text-white transition-all shadow-md border-green-800 border-2 bg-green-50" />
 			</form>
-			<div className="flex gap-2 py-3 flex-wrap items-center justify-center">
+			<div className="flex gap-2 py-3 flex-wrap items-center justify-center w-full">
 				{
 					process.map((process: Process, index: number) => (
 						<div key={process.title} className={`px-3 max-w-96 w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${

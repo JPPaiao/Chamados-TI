@@ -3,6 +3,7 @@ import express from "express"
 import { Request, Response } from "express"
 import { getAllCalls, setCall, routerUpdate } from "./controller/controllerCall"
 import { deleteUser, getUsers, setUser, updateUser, login } from "./controller/controllerUsers"
+import { verifyAuth } from "./controller/controllerAuth"
 
 const app = express()
 
@@ -25,7 +26,7 @@ app.put('/api/call/updateStatus', routerUpdate)
 
 app.post('/auth/login', login)
 
-app.post('/api/user/users', getUsers)
+app.post('/api/user/users', verifyAuth, getUsers)
 app.post('/api/user/set', setUser)
 app.put('/api/user/update', updateUser)
 app.delete('/api/user/delete', deleteUser)

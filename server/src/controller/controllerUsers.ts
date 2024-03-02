@@ -29,7 +29,7 @@ const login = (req: Request, res: Response) => {
 
 		if (!userAlvo || userAlvo === undefined) {
 			res.status(401).json({menssage: 'Email ou senha invalido'})
-		} else if (!userAlvo || userAlvo?.password === login.password) {
+		} else if (!userAlvo.password || userAlvo?.password !== login.password) {
 			res.status(401).json({menssage: 'Email ou senha invalido'})
 		}
 

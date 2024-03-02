@@ -1,13 +1,46 @@
 import { users } from "src/models/users"
 import { Request, Response } from "express"
+import { sign } from 'jsonwebtoken'
 
 interface User {
-    id: number,
-    email: string
-    username: string,
-    password: string,
-    nivel: 'administrador' | 'usuário comum',
-    isAdmin: boolean
+	id: number,
+	email: string
+	username: string,
+	password: string,
+	nivel: 'administrador' | 'usuário comum',
+	isAdmin: boolean
+}
+
+interface Login {
+	email: string,
+	password: string
+}
+
+const secretKey = 'skljaksdj9983498327453lsldkj@@#'
+
+const login = (req: Request, res: Response) => {
+  const login: Login = req.body
+
+	if (login) {
+		const userAlvo = users.find((user: User) => user.email === login.email)
+
+		console.log(userAlvo)
+		console.log(login)
+
+		if (!userAlvo || userAlvo === undefined) {
+			res.status(401).json({menssage: 'Email ou senha invalido'})
+		} else if (!userAlvo || userAlvo?.password === login.password) {
+			res.status(401).json({menssage: 'Email ou senha invalido'})
+		}
+
+		const token = sign(login, secretKey)
+
+		res.status(200).json({
+			statusCode: 200,
+			message: 'Login realizado com sucesso',
+			toke: token
+		})
+	} else res.status(200).json({message: 'Erro: campos de email e senha não podem ser vazio'})
 }
 
 const permissionUser = (userId: number): boolean => {
@@ -65,4 +98,4 @@ const deleteUser = (req: Request, res: Response): void => {
     } else res.status(200).json({ response: "Erro: Insira um id valido" })
 }
 
-export { permissionUser, setUser, updateUser, deleteUser, getUsers }
+export { permissionUser, setUser, updateUser, deleteUser, getUsers, login }

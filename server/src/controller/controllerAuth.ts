@@ -4,22 +4,16 @@ import { NextFunction, Request, Response } from "express"
 const secretKey = 'skljaksdj9983498327453lsldkj@@#'
 
 const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
-  const tokenHeader = req.headers["auth"] as string
-  const token = tokenHeader.split(" ")[1]
-
-  if (!tokenHeader) {
-    res.status(401).json({ menssage: 'Erro: Usuário sem autorização para esta ação' })
-  } 
-  console.log(tokenHeader)
+  const tokenHeader: string = req.headers["auth"] as string
   
-  try {
-    console.log(token)
-    
-    verify(token, secretKey)
+  if (!tokenHeader) {
+    res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
+  } 
+  
+  verify(tokenHeader, secretKey, (err: any, user: any) => {
+    if (err) res.status(403).json({ menssage: 'Falha na autenticação do token' }) 
     next()
-  } catch (err) {
-    res.status(500).json({ menssage: 'Erro: Token não valido' })
-  }
+  })  
 }
 
 export { verifyAuth }

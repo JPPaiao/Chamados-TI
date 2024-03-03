@@ -24,9 +24,6 @@ const login = (req: Request, res: Response) => {
 	if (login) {
 		const userAlvo = users.find((user: User) => user.email === login.email)
 
-		console.log(userAlvo)
-		console.log(login)
-
 		if (!userAlvo || userAlvo === undefined) {
 			res.status(401).json({menssage: 'Email ou senha invalido'})
 		} else if (!userAlvo.password || userAlvo?.password !== login.password) {
@@ -50,10 +47,7 @@ const permissionUser = (userId: number): boolean => {
 }
 
 const getUsers = (req: Request, res: Response) => {
-    const userId = req.body.id
-    
-    if (permissionUser(userId)) res.status(200).json(users)
-    else res.status(200).json({ response: "Usuário sem permissão" })
+    res.status(200).json(users)
 }
 
 const setUser = (req: Request, res: Response) => {

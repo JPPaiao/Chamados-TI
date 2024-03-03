@@ -24,24 +24,19 @@ interface User {
 }
 
 const getAllCalls = (req: Request, res: Response) => {
-    console.log('/')
     res.status(200).json(callList)
 }
 
 const setCall = (req: Request, res: Response) => {
     const call: Call = req.body
-    console.log('/call/set')
 
     callList.push(call)
-
     res.status(200).json({ response: "Chamado adicionado com sucesso!" })
 }
 
 const routerUpdate = (req: Request, res: Response)  => {
     const userid = req.body.userId
     const userPermisson = users.find((user: User) => user.id === userid)
-
-    console.log('/call/update')
 
     if (userPermisson && permissionUser(userPermisson?.id)) { 
         const call: Call = req.body.call

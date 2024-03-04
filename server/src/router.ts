@@ -4,6 +4,7 @@ import { Request, Response } from "express"
 import { getAllCalls, setCall, routerUpdate } from "./controller/controllerCall"
 import { deleteUser, getUsers, setUser, updateUser, login } from "./controller/controllerUsers"
 import { verifyAuth } from "./controller/controllerAuth"
+import { CreateCustomerController } from "./controller/controllerCreateCustomer"
 
 const app = express()
 
@@ -19,6 +20,10 @@ app.use((req: Request, res: Response, next) => {
 })
 
 app.use(express.json())
+
+app.get('/test', async (req: Request, res: Response) => {
+	return new CreateCustomerController().handle(req, res)
+})
 
 app.get('/api/', verifyAuth, getAllCalls)
 app.post('/api/call/set', verifyAuth, setCall)

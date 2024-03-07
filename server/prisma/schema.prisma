@@ -27,11 +27,32 @@ model Customer {
 }
 
 model Users {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  username String
-  email String
-  password String
-  papel String @default("usuário padrão")
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  username  String
+  email     String
+  password  String
+  paper     String @default("usuário padrão")
 
   @@map("Users")
+}
+
+model Procedures {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  author      String
+  sector      String
+  pdfId       String?  @unique @map("_pdfId") @db.ObjectId
+  pdf         Pdf?     @relation(fields: [pdfId], references: [id])
+
+  @@map("Procedures")
+}
+
+model Pdf {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  content       Bytes
+  procedure     Procedures?
+
+  @@map("Pdf")
 }

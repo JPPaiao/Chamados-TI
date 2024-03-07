@@ -1,7 +1,7 @@
 import { verify } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from "express"
 
-const secretKey = 'skljaksdj9983498327453lsldkj@@#'
+const secretKey = process.env.SECRET as string
 
 const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
   const tokenHeader: string = req.headers["auth"] as string

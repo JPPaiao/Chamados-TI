@@ -2,13 +2,14 @@ import cors from "cors"
 import multer from "multer"
 import express, { Request, Response } from "express"
 import { getAllCalls, setCall, routerUpdate } from "./controller/controllerCall"
-import { verifyAuth } from "./controller/controllerAuth"
+import { verifyAuth } from "./controller/auth/controllerAuth"
 import { CreateUserController } from "./controller/users/createUser"
 import { ListUsersController } from "./controller/users/listUsers"
 import { UpdateUserController } from "./controller/users/updateUser"
 import { ListProceduresController } from "./controller/procedures/listProcedures"
 import { CreateProceduresController } from "./controller/procedures/createProcedures"
 import { DeleteProceduresController } from "./controller/procedures/deleteProcedures"
+import { LoginController } from "./controller/users/loginUser"
 
 const app = express()
 
@@ -31,6 +32,10 @@ app.put('/api/call/updateStatus', verifyAuth, routerUpdate)
 
 
 // USER -----------------------------
+app.post('/api/auth/login', async (req: Request, res: Response) => {
+	return new LoginController().handle(req, res)
+})
+
 app.post('/api/user/users', verifyAuth, async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 })

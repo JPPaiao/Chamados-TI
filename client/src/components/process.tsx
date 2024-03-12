@@ -1,52 +1,49 @@
-import { useState } from "react"
-import { PlusCircleIcon } from "./icons/plusCircle" 
+import { useEffect, useState } from "react"
+import { PlusCircleIcon } from "./icons/plusCircle"
 
 interface Process {
-	title: string,
-	description: string
+	procedure: {
+		id: string,
+		title: string,
+		description: string,
+		author: string,
+		sector: string,
+		pdfId: string
+	},
+	name: string,
+	content: any,
+	URL: string 
 }
 
 function Process() {
-	const [process, setProcess] = useState<Process[]>([
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-		{
-			title: 'Título',
-			description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem v vvlorem lorem  loremv lorem lorem lorem loremlorem lorem'
-		},
-	])
+	const [process, setProcess] = useState<Process[]>([])
 	const [openCards, setOpenCards] = useState<boolean[]>(Array(process.length).fill(false))
 	const [newProcess, setNewProcess] = useState<string>()
 
+	useEffect(() => {
+		fetch('http://localhost:3000/api/procedures', {
+			method: "get",
+			headers: {
+				"Content-Type": "application/json"
+			},
+		}).then(data => data.json())
+    .then((data: Process[]) => {
+			data.map(d => {
+				const dataUint8Array = new Uint8Array(d.content.data)
+				const binary = new Blob([dataUint8Array], { type: 'application/pdf' })
+				const blobURL = URL.createObjectURL(binary)
+
+				d.URL = blobURL
+			})
+
+			setProcess(data)
+		})
+	}, [])
+
+	
 	const toggleAddProcess = (e: any) => {
 		e.preventDefault()
-		if (newProcess) setProcess([...process,{ title: newProcess, description: 'lorem'}])
+		
 	}
 
   const toggleCard = (index: number) => {
@@ -64,12 +61,12 @@ function Process() {
 			<div className="flex gap-2 py-3 flex-wrap items-center justify-center w-full">
 				{
 					process.map((process: Process, index: number) => (
-						<div key={process.title} className={`px-3 max-w-96 w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${
+						<div key={process.procedure.title} className={`px-3 max-w-96 w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${
 								!openCards[index] ? 'h-auto' : 'h-auto'
 							}`}>
 								<div className="w-full flex items-center justify-between">
 									<div className="text-lg flex-initial">
-										{process.title}
+										{process.procedure.title}
 									</div>
 									<div 
 										className="cursor-pointer "
@@ -80,7 +77,10 @@ function Process() {
 								</div>
 							{openCards[index] && (
 								<div className="text-base py-1">
-									{process.description}
+									{process.procedure.description}
+									<div>
+										<a href={process.URL} download={`${process.name}`} >{process.name}</a>
+									</div>
 								</div>
 							)}
 						</div>			

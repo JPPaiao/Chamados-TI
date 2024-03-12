@@ -30,7 +30,6 @@ app.get('/api/', verifyAuth, getAllCalls)
 app.post('/api/call/set', verifyAuth, setCall)
 app.put('/api/call/updateStatus', verifyAuth, routerUpdate)
 
-
 // USER -----------------------------
 app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)

@@ -10,6 +10,7 @@ import { ListProceduresController } from "./controller/procedures/listProcedures
 import { CreateProceduresController } from "./controller/procedures/createProcedures"
 import { DeleteProceduresController } from "./controller/procedures/deleteProcedures"
 import { LoginController } from "./controller/users/loginUser"
+import { DeleteUserController } from "./controller/users/deleteUser"
 
 const app = express()
 
@@ -23,7 +24,6 @@ app.use((req: Request, res: Response, next) => {
 	res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 	next()
 })
-
 app.use(express.json())
 
 app.get('/api/', verifyAuth, getAllCalls)
@@ -35,7 +35,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.post('/api/user/users', verifyAuth, async (req: Request, res: Response) => {
+app.post('/api/user/users', async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 })
 
@@ -45,6 +45,10 @@ app.post('/api/user/create', async (req: Request, res: Response) => {
 
 app.put('/api/user/update',  async (req: Request, res: Response) => {
 	return new UpdateUserController().handle(req, res)
+})
+
+app.delete('/api/user/delete',  async (req: Request, res: Response) => {
+	return new DeleteUserController().handle(req, res)
 })
 
 // PROCEDURES ---------------------------

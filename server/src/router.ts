@@ -1,7 +1,6 @@
 import cors from "cors"
 import multer from "multer"
 import express, { Request, Response } from "express"
-import { getAllCalls, setCall, routerUpdate } from "./controller/controllerCall"
 import { verifyAuth } from "./controller/auth/controllerAuth"
 import { CreateUserController } from "./controller/users/createUser"
 import { ListUsersController } from "./controller/users/listUsers"
@@ -11,6 +10,8 @@ import { CreateProceduresController } from "./controller/procedures/createProced
 import { DeleteProceduresController } from "./controller/procedures/deleteProcedures"
 import { LoginController } from "./controller/users/loginUser"
 import { DeleteUserController } from "./controller/users/deleteUser"
+import { CreateRolesController } from "./controller/roles/createRoles"
+import { CreatePermissionController } from "./controller/permission/createPermission"
 
 const app = express()
 
@@ -26,16 +27,26 @@ app.use((req: Request, res: Response, next) => {
 })
 app.use(express.json())
 
-app.get('/api/', verifyAuth, getAllCalls)
-app.post('/api/call/set', verifyAuth, setCall)
-app.put('/api/call/updateStatus', verifyAuth, routerUpdate)
+// app.get('/api/', verifyAuth, getAllCalls)
+// app.post('/api/call/set', verifyAuth, setCall)
+// app.put('/api/call/updateStatus', verifyAuth, routerUpdate)
 
-// USER -----------------------------
+// PERMISSION -----------------------
+app.post('/api/permissions/create', verifyAuth, (req: Request, res: Response) => {
+	return new CreatePermissionController().handle(req, res)
+})
+
+// ROLES ----------------------------
+app.post('/api/roles/create', verifyAuth, (req: Request, res: Response) => {
+	return new CreateRolesController().handle(req, res)
+})
+
+// USERS -----------------------------
 app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.post('/api/user/users', async (req: Request, res: Response) => {
+app.post('/api/user/users', verifyAuth, async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 })
 

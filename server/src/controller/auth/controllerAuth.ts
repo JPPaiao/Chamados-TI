@@ -1,19 +1,24 @@
 import { verify } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from "express"
+import { config } from 'dotenv'
+config()
 
-const secretKey = process.env.SECRET as string
+const secretKey: string = process.env.SECRET as string
 
 const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
-  const tokenHeader: string = req.headers["auth"] as string
+  const tokenHeader: string = req.headers["token"] as string
   
   if (!tokenHeader) {
     res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
-  } 
-  
-  verify(tokenHeader, secretKey, (err: any, user: any) => {
-    if (err) res.status(403).json({ menssage: 'Falha na autenticação do token' }) 
+  }
+
+  try {
+    verify(tokenHeader, secretKey)
     next()
-  })  
+  } catch (err) {
+    console.log(err)
+    return res.status(401).end()
+  }
 }
 
 export { verifyAuth }

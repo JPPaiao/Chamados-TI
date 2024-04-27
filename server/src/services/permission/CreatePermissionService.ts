@@ -8,7 +8,7 @@ interface PermissionProps {
 class CreatePermissionService {
   async excute({ name, description }: PermissionProps): Promise<Error | Object> {
     if (await prismaClient.permissions.findFirst({ where: { name: name } })) {
-      throw new Error("Role ja existe no sistema")
+      throw new Error("Essa permissão ja existe no sistema")
     }
 
     const createPermission = await prismaClient.permissions.create({
@@ -18,10 +18,7 @@ class CreatePermissionService {
       }
     })
 
-    return { 
-      message: "Permissão criado com sucesso!",
-      ...createPermission
-    }
+    return createPermission
   }
 }
 

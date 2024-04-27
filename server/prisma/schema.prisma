@@ -26,7 +26,7 @@ model Customer {
 }
 
 model Users {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
   username    String
   email       String
   password    String
@@ -38,8 +38,8 @@ model Users {
 
 model Users_permissions {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  permission_id String      @map("_permission_id") @db.ObjectId
-  user_id       String      @map("_user_id") @db.ObjectId
+  permission_id String      @db.ObjectId
+  user_id       String      @db.ObjectId
   user          Users       @relation(fields: [user_id], references: [id])
   permission    Permissions @relation(fields: [permission_id], references: [id])
 
@@ -47,17 +47,17 @@ model Users_permissions {
 }
 
 model Users_roles {
-  id      String            @id @default(auto()) @map("_id") @db.ObjectId
-  role_id String?           @db.ObjectId
-  user_id String?           @db.ObjectId
-  Roles   Roles?            @relation(fields: [role_id], references: [id])
-  Users   Users?            @relation(fields: [user_id], references: [id])
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  role_id String @db.ObjectId
+  user_id String @db.ObjectId
+  Roles   Roles  @relation(fields: [role_id], references: [id])
+  Users   Users  @relation(fields: [user_id], references: [id])
 
   @@map("Users_roles")
 }
 
 model Permissions {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
   name              String
   description       String
   roles             Permissions_roles[]
@@ -77,7 +77,7 @@ model Permissions_roles {
 }
 
 model Roles {
-  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
   users       Users_roles[]

@@ -12,6 +12,9 @@ import { LoginController } from "./controller/users/loginUser"
 import { DeleteUserController } from "./controller/users/deleteUser"
 import { CreateRolesController } from "./controller/roles/createRoles"
 import { CreatePermissionController } from "./controller/permission/createPermission"
+import { CreateUserAccessControlContorller } from "./controller/accessCrontrol/CreateUserAccesControlController"
+import { CreateRolePermissionController } from "./controller/accessCrontrol/CreateRolePermissionController"
+import { can, is } from "./middleware/permissions"
 
 const app = express()
 
@@ -36,17 +39,31 @@ app.post('/api/permissions/create', verifyAuth, (req: Request, res: Response) =>
 	return new CreatePermissionController().handle(req, res)
 })
 
+app.post('/api/accessControl', verifyAuth, (req: Request, res: Response) => {
+	return new CreateUserAccessControlContorller().handle(req, res)
+})
+
+
+
+
 // ROLES ----------------------------
 app.post('/api/roles/create', verifyAuth, (req: Request, res: Response) => {
 	return new CreateRolesController().handle(req, res)
 })
+
+app.post('/api/roles/:roleId', verifyAuth, (req: Request, res: Response) => {
+	return new CreateRolePermissionController().handle(req, res)
+})
+
+
+
 
 // USERS -----------------------------
 app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.post('/api/user/users', verifyAuth, async (req: Request, res: Response) => {
+app.post('/api/user/users', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 })
 
@@ -62,19 +79,22 @@ app.delete('/api/user/delete',  async (req: Request, res: Response) => {
 	return new DeleteUserController().handle(req, res)
 })
 
+
+
+
 // PROCEDURES ---------------------------
-app.get('/api/procedures', async (req: Request, res: Response) => {
+app.get('/api/procedures', verifyAuth, async (req: Request, res: Response) => {
 	return new ListProceduresController().handle(req, res)
 })
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 
-app.post('/api/procedures/create', upload.single('pdf'), async (req: Request, res: Response) => {
+app.post('/api/procedures/create', verifyAuth, upload.single('pdf'), async (req: Request, res: Response) => {
 	return new CreateProceduresController().handle(req, res)
 })
 
-app.delete('/api/procedures/delete/:procedureId', async (req: Request, res: Response) => {
+app.delete('/api/procedures/delete/:procedureId', verifyAuth, async (req: Request, res: Response) => {
 	return new DeleteProceduresController().handle(req, res)
 })
 

@@ -1,4 +1,4 @@
-import { verify } from 'jsonwebtoken'
+import { decode, verify } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from "express"
 import { config } from 'dotenv'
 config()
@@ -14,9 +14,13 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     verify(tokenHeader, secretKey)
+    const useId = decode(tokenHeader)['userId'] as any
+    req.body.userId = useId
+
+    // console.log(useId)
+
     next()
   } catch (err) {
-    console.log(err)
     return res.status(401).end()
   }
 }

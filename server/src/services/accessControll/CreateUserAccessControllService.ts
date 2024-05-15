@@ -11,7 +11,9 @@ interface UserTypes {
   email: string,
   username: string,
   password: string,
+  permission_id: string[],
   permissions: Object[],
+  role_id: string[],
   roles: Object[]
 }
 
@@ -29,7 +31,7 @@ class CreateUserAccessControllService {
       },
       include: {
         permissions: true,
-        roles: true
+        roles: true,
       } 
     }) as UserTypes
   
@@ -37,42 +39,46 @@ class CreateUserAccessControllService {
       return new Error("Usuário não existe no sistema")
     }
 
-    const permissionsExists: PermissionsAndRolesTypes[] | any = await prismaClient.permissions.findMany({
-      where: {
-        id: { 
-          in: permissions 
-        }
-      }
-    }) 
+    const existPermissions = permissions.filter(id => user.permission_id.includes(id))
+    const existRoles = roles.filter(id => user.role_id.includes(id))
 
-    const rolesExists: PermissionsAndRolesTypes[] | any = await prismaClient.roles.findMany({
-      where: {
-        id: {
-          in: roles
-        }
-      }
-    })
+    if (existPermissions.length !== 0 || existRoles.length !== 0) {
+      return { response: "Permissões ou Roles ja existentes" }
+    }
 
-    const mapPermissionIds = permissionsExists.map((p: PermissionsAndRolesTypes) => p.id)
-    const mapRolesIds = rolesExists.map((r: PermissionsAndRolesTypes) => r.id)
+    const updatePermission = [...user.permission_id, ...permissions]
+    const updateRole = [...user.role_id, ...roles]
     
-    // if (rolesExists && permissionsExists) {
-      await prismaClient.users.create({
+    if (permissions.length !== 0) {
+      await prismaClient.users.update({
         where: {
           id: userId
         },
         data: {
-          permissions: mapPermissionIds
-          // permissions: mapPermissionIds,
-          // roles: mapRolesIds
+          permission_id: updatePermission
         },
         include: {
           permissions: true,
           roles: true
         }
       })
-    // }
+    }
 
+    if (roles.length !== 0) {
+      await prismaClient.users.update({
+        where: {
+          id: userId
+        },
+        data: {
+          role_id: updateRole
+        },
+        include: {
+          permissions: true,
+          roles: true
+        }
+      })
+    }
+    
     const userUpdated = await prismaClient.users.findFirst({ 
       where: { 
         id: userId 

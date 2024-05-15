@@ -17,29 +17,29 @@ class CreateRolePermissionService {
       return new Error('Role não existe no sistema')
     }
 
-    await prismaClient.permissions_roles.deleteMany({
-      where: {
-        role_id: roleId 
-      }
-    })
     const permissionsExists = await prismaClient.permissions.findMany({
-      select: {
-        id: true
-      },
       where: {
         id: {
           in: permissions
         }
+      },
+      select: {
+        id: true
       }
     })
 
-    const mapPermissions = permissionsExists.map(permi => permi.id)
-    await prismaClient.permissions_roles.create({
-      data: {
-        role_id: roleId,
-        permission_id: mapPermissions
-      }
-    })
+    const mapPermissionExists = permissionsExists.map(id => id.id)
+
+    if (mapPermissionExists.length > 0) {
+      await prismaClient.roles.update({
+        where: {
+          id: roleId
+        },
+        data: {
+          permission_id: mapPermissionExists
+        }
+      })
+    }
 
     const roleUpdated = await prismaClient.roles.findFirst({
       where: {
@@ -47,7 +47,7 @@ class CreateRolePermissionService {
       },
       include: {
         permissions: true,
-        users: true
+        user: true
       }
     })
 

@@ -63,11 +63,11 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.post('/api/user/users', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
+app.post('/api/user/users', verifyAuth, can(["list_product"]), async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
-})
+}) 
 
-app.post('/api/user/create', async (req: Request, res: Response) => {
+app.post('/api/user/create', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
 	return new CreateUserController().handle(req, res)
 })
 

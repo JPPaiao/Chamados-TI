@@ -26,62 +26,38 @@ model Customer {
 }
 
 model Users {
-  id          String              @id @default(auto()) @map("_id") @db.ObjectId
-  username    String
-  email       String
-  password    String
-  permissions Users_permissions[]
-  roles       Users_roles[]
+  id            String              @id @default(auto()) @map("_id") @db.ObjectId
+  username      String
+  email         String
+  password      String
+  permission_id String[]            @db.ObjectId
+  permissions   Permissions[]       @relation(fields: [permission_id], references: [id])  
+  role_id       String[]            @db.ObjectId
+  roles         Roles[]             @relation(fields: [role_id], references: [id])
 
   @@map("Users")
-}
-
-model Users_permissions {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  permission_id String      @db.ObjectId
-  user_id       String      @db.ObjectId
-  user          Users       @relation(fields: [user_id], references: [id])
-  permission    Permissions @relation(fields: [permission_id], references: [id])
-
-  @@map("Users_Permissions")
-}
-
-model Users_roles {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  role_id String @db.ObjectId
-  user_id String @db.ObjectId
-  Roles   Roles  @relation(fields: [role_id], references: [id])
-  Users   Users  @relation(fields: [user_id], references: [id])
-
-  @@map("Users_roles")
 }
 
 model Permissions {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
   name              String
   description       String
-  roles             Permissions_roles[]
-  Users_permissions Users_permissions[]
+  user_id           String[]            @db.ObjectId
+  user              Users[]             @relation(fields: [user_id], references: [id])
+  role_id           String[]            @db.ObjectId
+  roles             Roles[]             @relation(fields: [role_id], references: [id])
 
   @@map("Permissions")
 }
 
-model Permissions_roles {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  role_id       String       @db.ObjectId
-  permission_id String       @db.ObjectId
-  Roles         Roles?       @relation(fields: [role_id], references: [id])
-  Permissions   Permissions? @relation(fields: [permission_id], references: [id])
-
-  @@map("Permissions_role")
-}
-
 model Roles {
-  id          String              @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  users       Users_roles[]
-  permissions Permissions_roles[]
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  description         String
+  user_id             String[]          @db.ObjectId
+  user                Users[]           @relation(fields: [user_id], references: [id])
+  permission_id       String[]          @db.ObjectId
+  permissions         Permissions[]     @relation(fields: [permission_id], references: [id])  
 
   @@map("Roles")
 }

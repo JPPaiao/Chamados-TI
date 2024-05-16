@@ -44,8 +44,6 @@ app.post('/api/accessControl', verifyAuth, (req: Request, res: Response) => {
 })
 
 
-
-
 // ROLES ----------------------------
 app.post('/api/roles/create', verifyAuth, (req: Request, res: Response) => {
 	return new CreateRolesController().handle(req, res)
@@ -63,19 +61,19 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.post('/api/user/users', verifyAuth, can(["list_product"]), async (req: Request, res: Response) => {
+app.get('/api/user/users', verifyAuth, is(['admin']), can(["list_product"]), async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 }) 
 
-app.post('/api/user/create', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
+app.post('/api/user/create', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new CreateUserController().handle(req, res)
 })
 
-app.put('/api/user/update',  async (req: Request, res: Response) => {
+app.put('/api/user/update', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new UpdateUserController().handle(req, res)
 })
 
-app.delete('/api/user/delete',  async (req: Request, res: Response) => {
+app.delete('/api/user/delete', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new DeleteUserController().handle(req, res)
 })
 

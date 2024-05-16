@@ -2,26 +2,32 @@ import { prismaClient } from "src/prisma"
 
 interface LoginUserProps {
 	username: string,
-	password: string
+	password: string,
+}
+
+interface LoginUser extends LoginUserProps {
+	email: string,
+	id: string,	
 }
 
 class LoginUserService {
 	async execute({ username, password }: LoginUserProps) {
 		if (!username || !password) {
-			return { error: "Usuário ou senha invalidos", status: false }
+			return { status: false }
 		}
-
-		const user = await prismaClient.users.findFirst({
-			where: {
-				username: username
+		
+		try {
+			const user: LoginUser | null = await prismaClient.users.findFirst({
+				where: {
+					username: username
+				}
+			})
+			if (user && user?.password === password) {
+				return { user: user, status: true }
 			}
-		})
-
-		if (!user || user.password !== password) {
-			return { error: "Credenciais inválidas", status: false }
+		} catch (err) {
+			return { status: false }
 		}
-
-		return { user: user, status: true }
 	}	
 }
 

@@ -18,7 +18,7 @@ function SideBar() {
 				</nav>
 			</div>
 			<div className="flex flex-col gap-1">
-				<h2 className="font-semibold text-xl">Chamados</h2>
+				{/* <h2 className="font-semibold text-xl">Chamados</h2>
 				<nav className="flex flex-col gap-[2px] text-lg">
 					<Link to={'/'}>
 						<div className="flex items-center gap-2 px-3 py-[2px]  cursor-pointer hover:bg-green-900 transition-all">
@@ -32,7 +32,7 @@ function SideBar() {
 							<span>Chamados</span>
 						</div>
 					</Link>
-				</nav>
+				</nav> */}
 			</div>
 		</aside>
 	)

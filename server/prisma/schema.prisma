@@ -1,84 +1,87 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model Customer {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  username   String
-  email      String
-  password   String
-  status     Boolean
-  created_at DateTime? @default(now())
-  updated_at DateTime? @default(now())
-
-  @@map("Customers")
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Users {
-  id            String              @id @default(auto()) @map("_id") @db.ObjectId
+  id            String       @id @default(uuid()) 
   username      String
   email         String
   password      String
-  permission_id String[]            @db.ObjectId
-  permissions   Permissions[]       @relation(fields: [permission_id], references: [id])  
-  role_id       String[]            @db.ObjectId
-  roles         Roles[]             @relation(fields: [role_id], references: [id])
+  permissions   UserPermission[]
+  roles         UserRole[]
 
   @@map("Users")
 }
 
 model Permissions {
-  id                String              @id @default(auto()) @map("_id") @db.ObjectId
-  name              String
-  description       String
-  user_id           String[]            @db.ObjectId
-  user              Users[]             @relation(fields: [user_id], references: [id])
-  role_id           String[]            @db.ObjectId
-  roles             Roles[]             @relation(fields: [role_id], references: [id])
+  id          String       @id @default(uuid()) 
+  name        String
+  description String
+  users       UserPermission[]
+  roles       RolePermission[]
 
   @@map("Permissions")
 }
 
 model Roles {
-  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  description         String
-  user_id             String[]          @db.ObjectId
-  user                Users[]           @relation(fields: [user_id], references: [id])
-  permission_id       String[]          @db.ObjectId
-  permissions         Permissions[]     @relation(fields: [permission_id], references: [id])  
+  id          String       @id @default(uuid()) 
+  name        String
+  description String
+  users       UserRole[]
+  permissions RolePermission[]
 
   @@map("Roles")
 }
 
 model Procedures {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(uuid()) 
   title       String
   description String
   author      String
   sector      String
-  pdfId       String? @unique @map("_pdfId") @db.ObjectId
-  pdf         Pdf?    @relation(fields: [pdfId], references: [id])
+  pdfName     String
+  pdfId       String
+  URL         String
 
   @@map("Procedures")
 }
 
-model Pdf {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  content   Bytes
-  procedure Procedures?
+// Tabelas intermediárias para relações many-to-many
 
-  @@map("Pdf")
+model UserPermission {
+  userId        String      
+  permissionId  String  
+  user          Users       @relation(fields: [userId], references: [id])
+  permission    Permissions @relation(fields: [permissionId], references: [id])
+
+  @@id([userId, permissionId])
+  @@index([userId])
+  @@index([permissionId])
+}
+
+model UserRole {
+  userId   String 
+  roleId   String 
+  user     Users  @relation(fields: [userId], references: [id])
+  role     Roles  @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId        String      
+  permissionId  String     
+  role          Roles       @relation(fields: [roleId], references: [id])
+  permission    Permissions @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
 }

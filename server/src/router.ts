@@ -30,10 +30,6 @@ app.use((req: Request, res: Response, next) => {
 })
 app.use(express.json())
 
-// app.get('/api/', verifyAuth, getAllCalls)
-// app.post('/api/call/set', verifyAuth, setCall)
-// app.put('/api/call/updateStatus', verifyAuth, routerUpdate)
-
 // PERMISSION -----------------------
 app.post('/api/permissions/create', verifyAuth, (req: Request, res: Response) => {
 	return new CreatePermissionController().handle(req, res)
@@ -54,18 +50,16 @@ app.post('/api/roles/:roleId', verifyAuth, (req: Request, res: Response) => {
 })
 
 
-
-
 // USERS -----------------------------
 app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.get('/api/user/users', verifyAuth, is(['admin']), can(["list_product"]), async (req: Request, res: Response) => {
+app.get('/api/user/users', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 }) 
 
-app.post('/api/user/create', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
+app.post('/api/user/create', verifyAuth, async (req: Request, res: Response) => {
 	return new CreateUserController().handle(req, res)
 })
 
@@ -81,12 +75,11 @@ app.delete('/api/user/delete', verifyAuth, is(['admin']), async (req: Request, r
 
 
 // PROCEDURES ---------------------------
-app.get('/api/procedures', verifyAuth, async (req: Request, res: Response) => {
+app.get('/api/procedures',  async (req: Request, res: Response) => {
 	return new ListProceduresController().handle(req, res)
 })
 
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage })
+const upload = multer({ dest: 'uploads/' })
 
 app.post('/api/procedures/create', verifyAuth, upload.single('pdf'), async (req: Request, res: Response) => {
 	return new CreateProceduresController().handle(req, res)

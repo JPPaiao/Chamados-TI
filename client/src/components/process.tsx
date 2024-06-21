@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react"
 import { PlusCircleIcon } from "./icons/plusCircle"
 
-interface Process {
-	procedure: {
-		id: string,
-		title: string,
-		description: string,
-		author: string,
-		sector: string,
-		pdfId: string
-	},
+interface ProcessPdf {
+	id: string,
+	title: string,
+	description: string,
+	author: string,
+	sector: string,
+	pdfId: string	
+}
+
+interface Process extends ProcessPdf {
 	name: string,
 	content: any,
 	URL: string 
@@ -97,12 +98,12 @@ function Process() {
 			<div className="flex gap-2 py-3 flex-wrap items-center justify-center w-full">
 				{
 					process.map((process: Process, index: number) => (
-						<div key={process.procedure.id} className={`px-3 max-w-96 w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${
+						<div key={process.id} className={`px-3 max-w-96 w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${
 								!openCards[index] ? 'h-auto' : 'h-auto'
 							}`}>
 								<div className="w-full flex items-center justify-between">
 									<div className="text-lg flex-initial">
-										{process.procedure.title}
+										{process.title}
 									</div>
 									<div 
 										className="cursor-pointer "
@@ -113,7 +114,7 @@ function Process() {
 								</div>
 							{openCards[index] && (
 								<div className="text-base py-1">
-									{process.procedure.description}
+									{process.description}
 									<div>
 										<a href={process.URL} target="_blank" >{process.name}</a>
 									</div>

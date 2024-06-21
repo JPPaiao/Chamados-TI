@@ -1,9 +1,11 @@
 import { prismaClient } from "src/prisma"
 
 interface CreateUserProps {
+  id?: string,
   username: string,
   email: string,
   password: string,
+
 }
 
 class CreateUserService {
@@ -13,7 +15,7 @@ class CreateUserService {
       throw new Error("Preencha todos os campos")
     }
 
-    const user = await prismaClient.users.create({
+    await prismaClient.users.create({
       data: {
         username,
         email,
@@ -21,7 +23,7 @@ class CreateUserService {
       }
     })
 
-    return user
+    return `Usuário ${username} criado com sucesso`
   }
 }
 

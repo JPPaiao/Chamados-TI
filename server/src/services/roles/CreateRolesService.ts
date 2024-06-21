@@ -8,7 +8,7 @@ interface RolesProps {
 class CreateRolesService {
   async excute({ name, description }: RolesProps): Promise<Error | Object> {
     if (await prismaClient.roles.findFirst({ where: { name: name } })) {
-      throw new Error("Essa role ja existe no sistema")
+      return "Essa role ja existe no sistema"
     }
 
     const createRole = await prismaClient.roles.create({

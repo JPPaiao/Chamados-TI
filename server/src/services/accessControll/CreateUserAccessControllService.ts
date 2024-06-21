@@ -6,21 +6,23 @@ interface ACLTypes {
   permissions: string[]
 }
 
+interface UserPermissions {
+  userId: string; 
+  permissionId: string 
+}
+
+interface UserRoles {
+  userId: string; 
+  roleId: string 
+}
+
 interface UserTypes {
   id: string,
   email: string,
   username: string,
   password: string,
-  permission_id: string[],
-  permissions: Object[],
-  role_id: string[],
-  roles: Object[]
-}
-
-interface PermissionsAndRolesTypes {
-  id: string; 
-  name: string; 
-  description: string; 
+  permissions?: UserPermissions[],
+  roles?: UserRoles[]
 }
 
 class CreateUserAccessControllService {
@@ -31,52 +33,52 @@ class CreateUserAccessControllService {
       },
       include: {
         permissions: true,
-        roles: true,
-      } 
+        roles: true
+      }
     }) as UserTypes
   
-    if (!user) {
+    if (!user.id) {
       return new Error("Usuário não existe no sistema")
     }
 
-    const existPermissions = permissions.filter(id => user.permission_id.includes(id))
-    const existRoles = roles.filter(id => user.role_id.includes(id))
+    if (permissions.length > 0) {
+      const newPermissionUser = user.permissions?.map((p: UserPermissions) => p.permissionId) as string | undefined
+      const newPermissionFilter = permissions.filter((v: string) => !newPermissionUser?.includes(v))
+      
+      if (newPermissionFilter.length === 0) {
+        return "Permissões ja existe para esse usuário"
+      }
+      
+      newPermissionFilter.map(async (permission: string) => {
+        await prismaClient.userPermission.create({
+          data: {
+            userId: user.id,
+            permissionId: permission
+          }
+        }) 
+      })
+    } 
 
-    if (existPermissions.length !== 0 || existRoles.length !== 0) {
-      return { response: "Permissões ou Roles ja existentes" }
+    if (roles.length > 0) {
+      const newRoleUser = user.roles?.map((p: UserRoles) => p.roleId) as string | undefined
+      const newRoleFilter = roles.filter((v: string) => !newRoleUser?.includes(v))
+      
+      if (newRoleFilter.length === 0) {
+        return "Roles ja existe para esse usuário"
+      }
+      
+      newRoleFilter.map(async (role: string) => {
+        await prismaClient.userRole.create({
+          data: {
+            userId: user.id,
+            roleId: role
+          }
+        })
+      })
     }
-
-    const updatePermission = [...user.permission_id, ...permissions]
-    const updateRole = [...user.role_id, ...roles]
     
-    if (permissions.length !== 0) {
-      await prismaClient.users.update({
-        where: {
-          id: userId
-        },
-        data: {
-          permission_id: updatePermission
-        },
-        include: {
-          permissions: true,
-          roles: true
-        }
-      })
-    }
-
-    if (roles.length !== 0) {
-      await prismaClient.users.update({
-        where: {
-          id: userId
-        },
-        data: {
-          role_id: updateRole
-        },
-        include: {
-          permissions: true,
-          roles: true
-        }
-      })
+    if (roles.length === 0 && permissions.length === 0) {
+      return "Sem Roles e Permissions"
     }
     
     const userUpdated = await prismaClient.users.findFirst({ 
@@ -86,7 +88,7 @@ class CreateUserAccessControllService {
       include: {
         permissions: true,
         roles: true
-      }  
+      } 
     }) as UserTypes
 
     return userUpdated

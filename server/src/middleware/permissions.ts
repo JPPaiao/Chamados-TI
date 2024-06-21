@@ -1,22 +1,6 @@
 import { Response, Request, NextFunction } from "express"
 import { prismaClient } from "src/prisma"
 
-interface PermissionsType {
-  id: string;
-  name: string;
-  description: string;
-  user_id: string[];
-  role_id: string[];
-}
-
-interface RoleType {
-  id: string;
-  name: string;
-  description: string;
-  user_id: string[];
-  permission_id: string[];
-}
-
 function can(permissionsRoutes: string[]) {
   return async function userPermission(req: Request, res: Response, next: NextFunction) {
     const { userId }: any = req.body
@@ -25,22 +9,34 @@ function can(permissionsRoutes: string[]) {
       where: {
         id: userId,
       },
-      include: {
-        permissions: true,
-        roles: true
-     }
+      select: {
+        id: true,
+      }
     })
 
     if (!user || user.id !== userId) {
       return res.status(400).json("Usuário não existe no sistema")
     }
 
-    const verify = user?.permissions
-    .map((permission: PermissionsType) => permission.name)
-    .some((permisisonName: string) => permissionsRoutes.includes(permisisonName))
-    // const verify = namePermissionsUser?.some((permisisonName: string) => permissionsRoutes.includes(permisisonName))
+    const permissionNames = await prismaClient.userPermission.findMany({
+      where: {
+        userId: user.id,
+        permission: {
+          name: {
+            in: permissionsRoutes
+          }
+        }  
+      },
+      select: {
+        permission: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
 
-    if (!verify) {
+    if (!permissionNames[0]?.permission?.name) {
       res.status(401).json("Usuário sem permissão").end()
     } else next()
   }
@@ -54,9 +50,8 @@ function is(rolesRoutes: string[]) {
       where: {
         id: userId,
       },
-      include: {
-        roles: true,
-        permissions: true
+      select: {
+        id: true
      }
     })
 
@@ -64,12 +59,26 @@ function is(rolesRoutes: string[]) {
       return res.status(400).json("Usuário não existe no sistema")
     }
 
-    const verify = user?.roles
-    .map((role: RoleType) => role.name) 
-    .some((roleName: string) => rolesRoutes.includes(roleName))
-
-    if (!verify) {
-      res.status(401).json("Usuário sem permissão").end()
+    const rolesNames = await prismaClient.userRole.findMany({
+      where: {
+        userId: user.id,
+        role: {
+          name: {
+            in: rolesRoutes
+          }
+        }  
+      },
+      select: {
+        role: {
+          select: {
+            name: true
+          }
+        }
+      }
+    })
+    
+    if (!rolesNames[0]?.role?.name) {
+      res.status(401).json("Usuário sem esse acesso").end()
     } else next()
   }
 }

@@ -39,7 +39,7 @@ model Roles {
 }
 
 model Procedures {
-  id          String       @id @default(uuid()) 
+  id          Int       @id @default(autoincrement()) 
   title       String
   description String
   author      String

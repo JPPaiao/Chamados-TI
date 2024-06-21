@@ -75,17 +75,17 @@ app.delete('/api/user/delete', verifyAuth, is(['admin']), async (req: Request, r
 
 
 // PROCEDURES ---------------------------
-app.get('/api/procedures',  async (req: Request, res: Response) => {
+app.get('/api/procedures', verifyAuth, async (req: Request, res: Response) => {
 	return new ListProceduresController().handle(req, res)
 })
 
 const upload = multer({ dest: 'uploads/' })
 
-app.post('/api/procedures/create', verifyAuth, upload.single('pdf'), async (req: Request, res: Response) => {
+app.post('/api/procedures/create',  upload.single('pdf'), verifyAuth, async (req: Request, res: Response) => {
 	return new CreateProceduresController().handle(req, res)
 })
 
-app.delete('/api/procedures/delete/:procedureId', verifyAuth, async (req: Request, res: Response) => {
+app.delete('/api/procedures/delete/:procedureId', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
 	return new DeleteProceduresController().handle(req, res)
 })
 

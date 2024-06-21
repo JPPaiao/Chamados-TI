@@ -14,8 +14,8 @@ const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     verify(tokenHeader, secretKey)
-    const useId = decode(tokenHeader)['userId'] as any 
-    req.body.userId = useId
+    const userId = decode(tokenHeader)['userId'] as any 
+    req.body.userId = userId
 
     // console.log(useId)
 

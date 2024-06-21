@@ -5,7 +5,7 @@ class ListProceduresController {
 	async handle(req: Request, res: Response) {
 		const listProceduresService = await new ListProceduresService().execute()
 
-		res.json(listProceduresService)
+		res.status(200).json(listProceduresService)
 	}
 }
 

@@ -1,23 +1,28 @@
-import { Response, Request, NextFunction } from "express"
-import multer from "multer"
+import { Response, Request } from "express"
 import { CreateProceduresService } from "src/services/process/CreateProceduresService"
 
 interface CreateProceduresProps {
 	title: string,
 	description: string,
-	author: string,
-	sector: string
+	sector: string,
+	userId: string,
 	pdfName: string
 }
 
 class CreateProceduresController {
 	async handle(req: Request, res: Response) {
-		const { author, description, sector, title, pdfName }: CreateProceduresProps = req.body 
-		const content = req.file?.buffer as Buffer
+		const { description, sector, title, pdfName, userId }: CreateProceduresProps = req.body
+		const pdfPath = req.file?.path
+		const author = userId
 
-		const saveProcedures = await new CreateProceduresService().execute({ title, author, content, description, sector, pdfName })
+		if (!pdfPath) {
+			res.status(401).json('Error: pdf não informado')
+			return
+		}
 
-		res.json(saveProcedures)
+		const saveProcedures = await new CreateProceduresService().execute({ title, author, pdfPath, description, sector, pdfName })
+
+		res.status(200).json(saveProcedures)
 	}
 }
 

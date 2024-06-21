@@ -1,8 +1,8 @@
-import { prismaClient } from "src/prisma";
+import { prismaClient } from "src/prisma"
 
 class ListProceduresService {
 	async execute() {
-		const listPdfs = await prismaClient.pdf.findMany({select: { procedure: true, content: true, name: true } })
+		const listPdfs = await prismaClient.procedures.findMany()
 
 		return listPdfs
 	}

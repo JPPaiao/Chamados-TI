@@ -3,7 +3,7 @@ import { DeleteProceduresService } from "src/services/process/DeleteProceduresSe
 
 class DeleteProceduresController {
   async handle(req: Request, res: Response) {
-		const proceduresId = req.params.procedureId
+		const proceduresId = parseInt(req.params.procedureId)
 
 		if (!proceduresId) res.json({ message: "Error: Passe um ID valido" })
 

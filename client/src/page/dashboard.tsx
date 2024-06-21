@@ -31,10 +31,10 @@ function Dashboard() {
 
 	return (
     <div className="text-2xl text-black flex flex-col h-screen">
-      <Header />
       <div className="flex flex-wrap flex-1">
-        <SideBar />
+      <SideBar />
         <div className="flex-1 overflow-y-auto max-h-full">
+          <Header />
           <Outlet />
         </div>
       </div>

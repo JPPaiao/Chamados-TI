@@ -2,6 +2,7 @@ import { prismaClient } from "src/prisma"
 import { google } from "googleapis"
 import fs from 'fs'
 import key from '../../../keyDriver.json'
+import { connectDriver } from "src/controller/driver"
 
 interface CreateProceduresProps {
 	title: string,
@@ -9,40 +10,25 @@ interface CreateProceduresProps {
 	author: string,
 	sector: string,
 	pdfName: string,
-	pdfPath: string
+}
+
+interface ConnectDrive {
+	driverService: any,
+	fileMetaData: Object,
 }
 
 class CreateProceduresService {
-	async execute({ title, description, author, sector, pdfPath, pdfName }: CreateProceduresProps) {
+	async execute({ title, description, author, sector, pdfName }: CreateProceduresProps) {
 		if (!title || !description || !sector ) {
 			return { message: "Error: Preencha todos os campos" }
 		}
 
 		async function uploadFile() {
 			try {
-				const auth = new google.auth.JWT(
-					key.client_email,
-					undefined,
-					key.private_key,
-					['https://www.googleapis.com/auth/drive'],
-					undefined
-				)
-
-				await auth.authorize()
-
-				const driverService = google.drive({
-					version: 'v3',
-					auth
-				})
-
-				const fileMetaData = {
-					name: `${pdfName}.pdf`,
-					parents: ["15xagA2YJAxm5I-zC7WhipR38iKsfb9vJ"]
-				}
+				const { driverService, fileMetaData } = await connectDriver({ pdfName }) as ConnectDrive
 
 				const media = {
-					mineType: 'application/pdf',
-					body: fs.createReadStream(pdfPath)
+        	mineTye: 'application/pdf',
 				}
 
 				const file = await driverService.files.create({

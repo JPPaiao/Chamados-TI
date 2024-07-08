@@ -12,15 +12,14 @@ interface CreateProceduresProps {
 class CreateProceduresController {
 	async handle(req: Request, res: Response) {
 		const { description, sector, title, pdfName, userId }: CreateProceduresProps = req.body
-		const pdfPath = req.file?.path
 		const author = userId
 
-		if (!pdfPath) {
+		if (!req.file) {
 			res.status(401).json('Error: pdf não informado')
 			return
 		}
 
-		const saveProcedures = await new CreateProceduresService().execute({ title, author, pdfPath, description, sector, pdfName })
+		const saveProcedures = await new CreateProceduresService().execute({ title, author, description, sector, pdfName })
 
 		res.status(200).json(saveProcedures)
 	}

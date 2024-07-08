@@ -1,33 +1,16 @@
-import { useEffect, useState } from "react"
 import { Header } from "../components/header" 
 import { SideBar } from "../components/sideBar" 
-import { Outlet } from "react-router-dom"
-
-interface Called {
-  id: number,
-  name: string,
-  category: string,
-  date: string,
-  description: string,
-  sector: string,
-  status: string,
-  subject: string
-}
+import { Outlet, useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { RootState } from "../store/store"
 
 function Dashboard() {
-	// const [calleds, setCalleds] = useState<Called[]>([])
+  const userAuth = useSelector((state: RootState) => state.users)
+  const navigate = useNavigate()
 
-  // useEffect(() => {
-  //   fetch('http://localhost:3000/api/', {
-  //     method: "get",
-  //     headers: {
-  //       "Content-Type": "application/json"
-  //     },
-  //   })
-  //   .then(d => d.json())
-  //   .then((d: Called[]) => setCalleds(d))
-    
-  // }, [])
+  if (!userAuth.token) {
+    navigate('/')
+  }
 
 	return (
     <div className="text-2xl text-black flex flex-col h-screen">

@@ -1,6 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from "react"
-import { Form, redirect, useActionData } from "react-router-dom"
+import { Form, useActionData, useNavigate } from "react-router-dom"
+import { useDispatch } from 'react-redux'
+import { userAuth } from "../store/users/userSlice"
+
+interface AuthLogin {
+  auth: boolean,
+  data: any
+}
 
 const action = async ({ request }) => {
   const formData = await request.formData()
@@ -22,17 +29,39 @@ const action = async ({ request }) => {
 
     if (data.token) {
       console.log(data)
-      return redirect('/dashboard') 
+      
+
+      return  {
+        auth: true,
+        data: data
+      }
     }
   }
-  return false 
+  return {
+    auth: false,
+  } 
 }
 
 function Login() {
   const [loginInvalid, setLoginInvalid] = useState("")
-  const actionData: boolean = useActionData() as boolean
+  const actionData = useActionData() as AuthLogin
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  if (actionData && actionData.auth) {
+    dispatch(
+      userAuth({
+        token: actionData.data.token,
+        email: actionData.data.user.email,
+        username: actionData.data.user.username,
+        id: actionData.data.user.id
+      })
+    )
+
+    navigate("/dashboard")
+  }
   
-  if (actionData !== undefined && !loginInvalid) {
+  if (actionData && !actionData.auth && !loginInvalid) {
     setLoginInvalid("Login ou senha invalidos!")
   } 
 

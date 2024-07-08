@@ -17,18 +17,8 @@ import { CreateRolePermissionController } from "./controller/accessCrontrol/Crea
 import { can, is } from "./middleware/permissions"
 
 const app = express()
-
-app.use((req: Request, res: Response, next) => {
-	cors()
-	next()
-})
-app.use((req: Request, res: Response, next) => {
-	res.setHeader("Access-Control-Allow-Origin", "*")
-	res.setHeader("Access-Control-Allow-Methods", 'GET, PUT, POST, DELETE')
-	res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-	next()
-})
 app.use(express.json())
+app.use(cors())
 
 // PERMISSION -----------------------
 app.post('/api/permissions/create', verifyAuth, (req: Request, res: Response) => {
@@ -79,7 +69,8 @@ app.get('/api/procedures', verifyAuth, async (req: Request, res: Response) => {
 	return new ListProceduresController().handle(req, res)
 })
 
-const upload = multer({ dest: 'uploads/' })
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 
 app.post('/api/procedures/create',  upload.single('pdf'), verifyAuth, async (req: Request, res: Response) => {
 	return new CreateProceduresController().handle(req, res)

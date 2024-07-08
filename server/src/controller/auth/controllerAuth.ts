@@ -6,7 +6,7 @@ config()
 const secretKey: string = process.env.SECRET as string
 
 const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
-  const tokenHeader: string = req.headers["token"] as string
+  const tokenHeader: string = req.headers.authorization as string
   
   if (!tokenHeader) {
     res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })

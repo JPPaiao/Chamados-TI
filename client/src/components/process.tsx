@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react"
 import { PlusCircleIcon } from "./icons/plusCircle"
+import { RootState } from "../store/store"
+import { useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
 
-interface ProcessPdf {
+interface Process {
 	id: string,
 	title: string,
 	description: string,
 	author: string,
 	sector: string,
-	pdfId: string	
-}
-
-interface Process extends ProcessPdf {
-	name: string,
-	content: any,
-	URL: string 
+	pdfId: string
+	pdfName: string,
+	URL: string	
 }
 
 interface Response {
@@ -22,6 +21,12 @@ interface Response {
 }
 
 function Process() {
+	const tokenUser = useSelector((state: RootState) => state.users.token)
+	const navigate = useNavigate()
+	if (!tokenUser) {
+    navigate('/')
+  }
+
 	const [process, setProcess] = useState<Process[]>([])
 	const [openCards, setOpenCards] = useState<boolean[]>(Array(process.length).fill(false))
 	const [newProcess, setNewProcess] = useState<string>()
@@ -35,18 +40,11 @@ function Process() {
 		fetch('http://localhost:3000/api/procedures', {
 			method: "get",
 			headers: {
-				"Content-Type": "application/json"
+				"Content-Type": "application/json, multipart/form-data, application/pdf",
+				"authorization": tokenUser
 			},
 		}).then(data => data.json())
     .then((data: Process[]) => {
-			data.map(d => {
-				const dataUint8Array = new Uint8Array(d.content.data)
-				const binary = new Blob([dataUint8Array], { type: 'application/pdf' })
-				const blobURL = URL.createObjectURL(binary)
-
-				d.URL = blobURL
-			})
-
 			setProcess(data)
 		})
 	}, [responseMessage])
@@ -59,22 +57,27 @@ function Process() {
 	
 	const toggleAddProcess = async (e: any) => {
 		e.preventDefault()
-		
-		const formDataToSend: any = new FormData()
-		formDataToSend.append('title', newProcess)
-		formDataToSend.append('description', 'descrição')
-		formDataToSend.append('author', 'autor')
-		formDataToSend.append('sector', 'setor')
-		formDataToSend.append('pdfName', newPDF?.name)
-		formDataToSend.append('pdf', newPDF as File)
-		
-		const formResponse = await fetch('http://localhost:3000/api/procedures/create', {
-			method: 'post',
-			body: formDataToSend
-		})
-		.then(d => d.json())
-		
-		setResponseMessage(formResponse as Response)
+
+		if (newProcess && newPDF) {
+			const formDataToSend: any = new FormData()
+			formDataToSend.append('title', newProcess)
+			formDataToSend.append('description', 'descrição')
+			formDataToSend.append('author', 'autor')
+			formDataToSend.append('sector', 'setor')
+			formDataToSend.append('pdfName', newPDF?.name)
+			formDataToSend.append('pdf', newPDF as File)
+			
+			const formResponse = await fetch('http://localhost:3000/api/procedures/create', {
+				method: 'post',
+				body: formDataToSend,
+				headers: {
+					"authorization": tokenUser
+				},
+			})
+			.then(d => d.json())
+
+			setResponseMessage(formResponse as Response)
+		}
 	}
 
   const toggleCard = (index: number) => {
@@ -116,7 +119,7 @@ function Process() {
 								<div className="text-base py-1">
 									{process.description}
 									<div>
-										<a href={process.URL} target="_blank" >{process.name}</a>
+										<a href={process.URL} target="_blank" >{process.pdfName}</a>
 									</div>
 								</div>
 							)}

@@ -3,6 +3,8 @@ import { PlusCircleIcon } from "./icons/plusCircle"
 import { RootState } from "../store/store"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
+import { TrashIcon } from "./icons/trash"
+import { Modal } from "./modal"
 
 interface Process {
 	id: string,
@@ -15,11 +17,6 @@ interface Process {
 	URL: string	
 }
 
-interface Response {
-	id: string | undefined,
-	message: string | undefined
-}
-
 function Process() {
 	const tokenUser = useSelector((state: RootState) => state.users.token)
 	const navigate = useNavigate()
@@ -27,14 +24,18 @@ function Process() {
     navigate('/')
   }
 
+	const [modalIsOpen, setModalIsOpen] = useState(false)
+	const [modalAction, setModalAction] = useState(false)
+	const [modalMenssage, setModalMenssage] = useState("")
+	const [modalFunctionProcess, setModalFunctionProcess] = useState<() => Promise<void>>()
+
+	
+	const [processDelet, setProcessDelet] = useState<Process | null>(null)
 	const [process, setProcess] = useState<Process[]>([])
-	const [openCards, setOpenCards] = useState<boolean[]>(Array(process.length).fill(false))
 	const [newProcess, setNewProcess] = useState<string>()
 	const [newPDF, setNewPDF] = useState<File | null>(null)
-	const [responseMessage, setResponseMessage] = useState<Response>({
-		id: undefined,
-		message: undefined
-	})
+
+	const [openCards, setOpenCards] = useState<boolean[]>(Array(process.length).fill(false))
 
 	useEffect(() => {
 		fetch('http://localhost:3000/api/procedures', {
@@ -47,12 +48,18 @@ function Process() {
     .then((data: Process[]) => {
 			setProcess(data)
 		})
-	}, [responseMessage])
+	}, [modalMenssage, process])
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			setNewPDF(e.target.files[0])
 		}
+	}
+
+	const toggleCard = (index: number) => {
+		const updatedOpenCards = [...openCards]
+		updatedOpenCards[index] = !updatedOpenCards[index]
+		setOpenCards(updatedOpenCards)
 	}
 	
 	const toggleAddProcess = async (e: any) => {
@@ -67,7 +74,7 @@ function Process() {
 			formDataToSend.append('pdfName', newPDF?.name)
 			formDataToSend.append('pdf', newPDF as File)
 			
-			const formResponse = await fetch('http://localhost:3000/api/procedures/create', {
+			const responseMessage = await fetch('http://localhost:3000/api/procedures/create', {
 				method: 'post',
 				body: formDataToSend,
 				headers: {
@@ -75,24 +82,62 @@ function Process() {
 				},
 			})
 			.then(d => d.json())
-
-			setResponseMessage(formResponse as Response)
+			
+			handleOpenSucessoModal(responseMessage.message)
 		}
 	}
 
-  const toggleCard = (index: number) => {
-    const updatedOpenCards = [...openCards]
-    updatedOpenCards[index] = !updatedOpenCards[index]
-    setOpenCards(updatedOpenCards)
-  }
+	const toggleDeleteProcess = async () => {
+		const idDelete = processDelet?.id
+
+		if (idDelete === null) return closeModal()
+			await fetch(`http://localhost:3000/api/procedures/delete/${idDelete}`, {
+				method: 'delete',
+				headers: {
+					"authorization": tokenUser
+				},
+		}).then(d => d.json())
+
+		handleOpenSucessoModal(`Processo ${processDelet?.title}, deletado com sucesso!`)
+
+		setTimeout(() => {
+			closeModal()
+		}, 2000)
+	}
+
+
+	const handleOpenSucessoModal = (menssage: string) => {
+		setModalMenssage(menssage)
+		setModalAction(false)
+		openModal()
+		
+		setNewProcess("")
+		setNewPDF(null)
+
+		setTimeout(() => {
+			closeModal()
+		}, 1000)
+	}
+
+	const handleOpenDeleteModal = (process: Process) => {
+		setProcessDelet(process)
+		setModalMenssage("Tem certeza que deseja excluir?")
+		setModalAction(true)
+		openModal()
+	}
+
+	const openModal = () => {
+		setModalIsOpen(true) 
+	}
+
+	const closeModal = () => {
+		setModalIsOpen(false)
+	}
 
 	return (
 		<div className="flex gap-4 px-6 py-4 flex-wrap items-center justify-center flex-co">
-			{/* {responseMessage.message && ( 
-				<div className="absolute text-xl bg-green-400 border-2 border-black text-black shadow px-3 py-1">
-					{responseMessage.message}
-				</div>
-			)} */}
+			<Modal mensagen={modalMenssage} actionType={modalAction} isOpen={modalIsOpen} onCancel={closeModal} onConfirm={toggleDeleteProcess} />
+
 			<form className="flex justify-around w-full text-sm" onSubmit={(e) => toggleAddProcess(e)}>
 				<input onChange={(e) => setNewProcess(e.target.value)} type="text" placeholder="Título" className="px-2 outline-none border-b-2 border-green-800" />
 				<input onChange={(e) => handleFileChange(e)} type="file" placeholder="PDF" className="pr-2 outline-none border-b-2 border-green-800 cursor-pointer" />
@@ -108,11 +153,19 @@ function Process() {
 									<div className="text-lg flex-initial">
 										{process.title}
 									</div>
-									<div 
-										className="cursor-pointer "
-										onClick={() => toggleCard(index)}	
+									<div className="flex gap-2 items-center">
+										<div
+											className="cursor-pointer"
+											onClick={() => handleOpenDeleteModal(process)}
 										>
-										<PlusCircleIcon width="w-6" />
+											<TrashIcon width="w-5" />
+										</div>
+										<div 
+											className="cursor-pointer"
+											onClick={() => toggleCard(index)}	
+											>
+											<PlusCircleIcon width="w-6" />
+										</div>
 									</div>
 								</div>
 							{openCards[index] && (

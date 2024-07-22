@@ -28,9 +28,6 @@ const action = async ({ request }) => {
     .then(res => res.json())
 
     if (data.token) {
-      console.log(data)
-      
-
       return  {
         auth: true,
         data: data

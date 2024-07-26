@@ -15,6 +15,9 @@ import { CreatePermissionController } from "./controller/permission/createPermis
 import { CreateUserAccessControlContorller } from "./controller/accessCrontrol/CreateUserAccesControlController"
 import { CreateRolePermissionController } from "./controller/accessCrontrol/CreateRolePermissionController"
 import { can, is } from "./middleware/permissions"
+import { ListRolesController } from "./controller/roles/listRoles"
+import { ListRolesUserController } from "./controller/roles/listRolesUser"
+import { verifyRoles } from "./controller/auth/verifyRoles"
 
 const app = express()
 app.use(express.json())
@@ -39,6 +42,14 @@ app.post('/api/roles/:roleId', verifyAuth, (req: Request, res: Response) => {
 	return new CreateRolePermissionController().handle(req, res)
 })
 
+app.get('/api/roles', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
+	return new ListRolesController().handle(req, res)
+})
+
+app.get('/api/roles/user', verifyAuth, async (req: Request, res: Response) => {
+	return verifyRoles(req, res)
+})
+
 
 // USERS -----------------------------
 app.post('/api/auth/login', async (req: Request, res: Response) => {
@@ -49,7 +60,7 @@ app.get('/api/user/users', verifyAuth, is(["admin"]), async (req: Request, res: 
 	return new ListUsersController().handle(req, res)
 }) 
 
-app.post('/api/user/create', verifyAuth, async (req: Request, res: Response) => {
+app.post('/api/user/create', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new CreateUserController().handle(req, res)
 })
 
@@ -61,6 +72,9 @@ app.delete('/api/user/delete', verifyAuth, is(['admin']), async (req: Request, r
 	return new DeleteUserController().handle(req, res)
 })
 
+app.get('/api/user/roles', verifyAuth, async (req: Request, res: Response) => {
+	return new ListRolesUserController().handle(req, res)
+})
 
 
 

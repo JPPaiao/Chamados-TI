@@ -5,19 +5,22 @@ config()
 
 const secretKey: string = process.env.SECRET as string
 
-const verifyAuth = (req: Request, res: Response, next: NextFunction) => {
+const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
   const tokenHeader: string = req.headers.authorization as string
   
-  if (!tokenHeader) {
-    res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
-  }
-
   try {
-    verify(tokenHeader, secretKey)
-    const userId = decode(tokenHeader)['userId'] as any 
-    req.body.userId = userId
+    if (!tokenHeader) {
+      res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
+    }
 
-    // console.log(useId)
+    verify(tokenHeader, secretKey)
+    const payload = decode(tokenHeader)?.userId as null | string
+
+    if (!payload) {
+      return res.status(401).json({ menssage: 'Sem autorização para acessar essa rota' })
+    }
+
+    req.body.userId = payload
 
     next()
   } catch (err) {

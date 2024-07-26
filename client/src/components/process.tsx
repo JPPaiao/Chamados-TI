@@ -18,17 +18,15 @@ interface Process {
 }
 
 function Process() {
-	const tokenUser = useSelector((state: RootState) => state.users.token)
+	const tokenUser = useSelector((state: RootState) => state.users.user)
 	const navigate = useNavigate()
-	if (!tokenUser) {
+	if (!tokenUser || tokenUser === null) {
     navigate('/')
   }
 
 	const [modalIsOpen, setModalIsOpen] = useState(false)
 	const [modalAction, setModalAction] = useState(false)
 	const [modalMenssage, setModalMenssage] = useState("")
-	const [modalFunctionProcess, setModalFunctionProcess] = useState<() => Promise<void>>()
-
 	
 	const [processDelet, setProcessDelet] = useState<Process | null>(null)
 	const [process, setProcess] = useState<Process[]>([])
@@ -42,7 +40,7 @@ function Process() {
 			method: "get",
 			headers: {
 				"Content-Type": "application/json, multipart/form-data, application/pdf",
-				"authorization": tokenUser
+				"authorization": tokenUser?.token as string
 			},
 		}).then(data => data.json())
     .then((data: Process[]) => {
@@ -78,7 +76,7 @@ function Process() {
 				method: 'post',
 				body: formDataToSend,
 				headers: {
-					"authorization": tokenUser
+					"authorization": tokenUser?.token as string
 				},
 			})
 			.then(d => d.json())
@@ -94,7 +92,7 @@ function Process() {
 			await fetch(`http://localhost:3000/api/procedures/delete/${idDelete}`, {
 				method: 'delete',
 				headers: {
-					"authorization": tokenUser
+					"authorization": tokenUser?.token as string
 				},
 		}).then(d => d.json())
 

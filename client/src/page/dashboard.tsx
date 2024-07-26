@@ -5,10 +5,10 @@ import { useSelector } from "react-redux"
 import { RootState } from "../store/store"
 
 function Dashboard() {
-  const userAuth = useSelector((state: RootState) => state.users)
+  const userAuth = useSelector((state: RootState) => state.users.user)
   const navigate = useNavigate()
 
-  if (!userAuth.token) {
+  if (!userAuth) {
     navigate('/')
   }
 

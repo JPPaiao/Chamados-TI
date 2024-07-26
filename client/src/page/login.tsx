@@ -1,12 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from "react"
-import { Form, useActionData, useNavigate } from "react-router-dom"
+import { Form, redirect, useActionData, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
 import { userAuth } from "../store/users/userSlice"
+import { store } from "../store/store"
 
 interface AuthLogin {
   auth: boolean,
   data: any
+}
+
+const loader = async () => {
+  const userAuth = store.getState().users.user
+
+  return userAuth === null ? redirect('/') : redirect('/dashboard') 
 }
 
 const action = async ({ request }) => {
@@ -88,4 +95,4 @@ function Login() {
   )
 }
 
-export { Login, action }
+export { Login, action, loader }

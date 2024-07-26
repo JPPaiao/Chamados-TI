@@ -19,13 +19,8 @@ class LoginController {
 		}
 		
 		const token = jwt.sign({ userId: loginUserService.user?.id }, secretKey)
-		const loginUser = {
-			id: loginUserService.user?.id,
-			email: loginUserService.user?.email,
-			username: loginUserService.user?.username
-		}
 
-		res.status(200).json({ user: loginUser, token })
+		res.status(200).json({ ...loginUserService, token })
 		return;
 	}
 }

@@ -5,9 +5,20 @@ interface LoginUserProps {
 	password: string,
 }
 
-interface LoginUser extends LoginUserProps {
+interface RoleAndPermissions {
+	permissions: {
+		permissionId: string,
+		userId: string
+	},
+	roles: {
+		roleId: string,
+		userId: string
+	}
+}
+
+interface LoginUser extends LoginUserProps, RoleAndPermissions {
 	email: string,
-	id: string,	
+	id: string
 }
 
 class LoginUserService {
@@ -17,11 +28,24 @@ class LoginUserService {
 		}
 		
 		try {
-			const user: LoginUser | null = await prismaClient.users.findFirst({
+			const user = await prismaClient.users.findFirst({
 				where: {
 					username: username
+				},
+				include: {
+					permissions: {
+						select: {
+							permission: true
+						}
+					},
+					roles: {
+						select: {
+							role: true
+						}
+					}
 				}
-			})
+			}) as LoginUser | null
+
 			if (user && user?.password === password) {
 				return { user: user, status: true }
 			}

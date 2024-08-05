@@ -5,20 +5,24 @@ interface UserTypes {
   email: string,
   username: string,
   id: string,
-  // role: string
 }
 
 interface InitialStateType {
-  user: UserTypes | null
+  user: UserTypes | null,
+  auth: boolean
 }
 
-const getUserLocalStorage = (): UserTypes => {
+const getUserLocalStorage = (): UserTypes | null => {
   const user = localStorage.getItem('userToken')
-  return user ? JSON.parse(user) : null
+  if (user) {
+    return JSON.parse(user)
+  }
+  return null
 }
 
 const initialState: InitialStateType = {
-  user: getUserLocalStorage()
+  user: getUserLocalStorage(),
+  auth: getUserLocalStorage() ? true : false
 }
 
 const userSlice = createSlice({
@@ -27,21 +31,26 @@ const userSlice = createSlice({
   reducers: {
     userAuth: (state, action: PayloadAction<UserTypes>) => {
       state.user = action.payload
+      state.auth = true
 
       localStorage.setItem('userToken', JSON.stringify(action.payload))
     },
 
     removeAuth: state => {
       state.user = null
-
+      state.auth = false
+      
       localStorage.removeItem('userToken')
     },
 
-    userLogged: () => {
+    userLogged: (state) => {
       const userStorage = getUserLocalStorage()
 
+      state.user = userStorage
       if (!userStorage) {
-        initialState.user = userStorage
+        state.auth = true
+      } else {
+        state.auth = false
       }
     }
   }

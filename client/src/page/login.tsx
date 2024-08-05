@@ -2,18 +2,31 @@
 import { useState } from "react"
 import { Form, redirect, useActionData, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
-import { userAuth } from "../store/users/userSlice"
+import { userAuth, userLogged } from "../store/users/userSlice"
 import { store } from "../store/store"
 
-interface AuthLogin {
+interface ActionProps {
   auth: boolean,
-  data: any
+  data: AuthLogin
+}
+
+interface AuthLogin {
+  token: string
+  user: {
+    email: string,
+    username: string,
+    id: string
+  }
 }
 
 const loader = async () => {
-  const userAuth = store.getState().users.user
+  userLogged()
+  const userAuth = store.getState().users.auth
 
-  return userAuth === null ? redirect('/') : redirect('/dashboard') 
+  if (userAuth) {
+    return redirect('/dashboard')
+  }
+  return null
 }
 
 const action = async ({ request }) => {
@@ -32,7 +45,7 @@ const action = async ({ request }) => {
       },
       body: JSON.stringify(body) 
     })
-    .then(res => res.json())
+    .then(res => res.json()) as AuthLogin
 
     if (data.token) {
       return  {
@@ -48,7 +61,7 @@ const action = async ({ request }) => {
 
 function Login() {
   const [loginInvalid, setLoginInvalid] = useState("")
-  const actionData = useActionData() as AuthLogin
+  const actionData = useActionData() as ActionProps
   const dispatch = useDispatch()
   const navigate = useNavigate()
 

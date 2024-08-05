@@ -1,17 +1,20 @@
 import { Header } from "../components/header" 
 import { SideBar } from "../components/sideBar" 
-import { Outlet, useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
-import { RootState } from "../store/store"
+import { Outlet, redirect } from "react-router-dom"
+import { store } from "../store/store"
+import { userLogged } from "../store/users/userSlice"
 
-function Dashboard() {
-  const userAuth = useSelector((state: RootState) => state.users.user)
-  const navigate = useNavigate()
+async function loader() {
+  userLogged()
+  const userAuth = store.getState().users.auth
 
   if (!userAuth) {
-    navigate('/')
+    return redirect('/')
   }
+  return null
+}
 
+function Dashboard() {
 	return (
     <div className="text-2xl text-black flex flex-col h-screen">
       <div className="flex flex-wrap flex-1">
@@ -25,4 +28,4 @@ function Dashboard() {
 	)
 }
 
-export { Dashboard }
+export { Dashboard, loader }

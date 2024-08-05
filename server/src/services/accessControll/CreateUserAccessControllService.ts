@@ -85,10 +85,12 @@ class CreateUserAccessControllService {
       where: { 
         id: userId 
       },
-      include: {
+      select: {
+        username: true,
+        email: true,
         permissions: true,
-        roles: true
-      } 
+        roles: true,
+      }
     }) as UserTypes
 
     return userUpdated

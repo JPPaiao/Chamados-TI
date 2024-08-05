@@ -1,40 +1,48 @@
 import { useSelector } from "react-redux"
-import { RootState } from "../store/store"
-// import { redirect, Route, Routes } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { Navigate, Outlet, useLoaderData } from "react-router-dom"
+import { RootState, store } from "../store/store"
 
 interface PrivateRoutesProps {
-  role?: string
+  role?: string[],
 }
 
-const PrivateRoutes = ({ role, ...res }: PrivateRoutesProps) => {
-  const userLogged = useSelector(( state: RootState ) => state.users.user)
-  const [roles, setRoles] = useState<string[]>([])
-
-  // useEffect(() => {
-  //   async function loadRoles() {
-  //     const response = fetch('http://localhost:3000/api/roles/user', {
-  //       method: "get",
-  //       headers: {
-  //         "Content-Type": "application/json, multipart/form-data, application/pdf",
-  //         "authorization": userLogged?.token as string
-  //       },
-  //     }).then(d => d.json())
-
-  //     // const findRole = response.
-  //     console.log(response)
-  //   }
-  // }, [])
-  
-  // if (!userLogged) {
-  //   return redirect('/')
-  // }
-
-  // if (!role && userLogged) {
-  //   return <Routes {...res} />
-  // }
-  
-  // return userLogged ? <Routes  {...res} /> : redirect('/')
+interface RolesUser {
+  id: string,
+  name: string,
+  description: string,
 }
 
-export { PrivateRoutes }
+async function loader() {
+  const user = store.getState().users.user
+  const rolesUser = await fetch('http://localhost:3000/api/roles/user', {
+    method: 'get',
+    headers: {
+      "authorization": user?.token as string
+    },
+  }).then(r => r.json()) as RolesUser[]
+
+  const rolesName = rolesUser.map(r => r.name)
+
+  return rolesName
+}
+
+const PrivateRoutes = ({ role }: PrivateRoutesProps) => {
+  const rolesName = useLoaderData() as string[]
+  const user = useSelector((state: RootState) => state.users.user)
+  
+  if (!user) {
+    return <Navigate to={"/"} />
+  }
+  
+  if (role) {    
+    if (rolesName.length === 0 ||  !rolesName.some(r => role.includes(r))) {
+      return <Navigate to={"/dashboard/unauthorized"} />
+    }
+  }
+  
+  return (
+    <Outlet />
+  )
+}
+
+export { PrivateRoutes, loader }

@@ -1,5 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import './index.css'
+import { ThemeProvider } from '@material-tailwind/react'
+import { Provider } from 'react-redux'
 import {
   createBrowserRouter,
   RouterProvider,
@@ -9,11 +11,21 @@ import {
   action as loginAction, 
   loader as loginLoader 
 } from './page/login.tsx'
-import { Dashboard } from './page/dashboard.tsx'
+import { 
+  Dashboard,
+  loader as dashboardLoader
+} from './page/dashboard.tsx'
+import { 
+  PrivateRoutes,
+  loader as privateRoutesLoader
+} from './router/privateRoutres.tsx'
+import { 
+  FormAdd, 
+  action as formDataAction 
+} from './components/formAdd.tsx'
 import { Process } from './components/process.tsx'
-import { Provider } from 'react-redux'
 import { store } from './store/store.ts'
-// import { PrivateRoutes } from './router/privateRoutres.tsx'
+import { Unauthorized } from './page/unauthorized.tsx'
 
 const router = createBrowserRouter([
   {
@@ -25,21 +37,36 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <Dashboard />,
+    loader: dashboardLoader,
     children: [
       {
-        path: "processos",
+        path: "unauthorized",
+        element: <Unauthorized />
+      },
+      {
+        path: "process",
         element: <Process />
       },
       {
-        path: "teste",
-        // element: <PrivateRoutes role='admin' />
+        path: "add",
+        element: <PrivateRoutes role={['admin', 'gerentes']} />,
+        loader: privateRoutesLoader,
+        children: [
+          {
+            path: "addProcess",
+            element: <FormAdd />,
+            action: formDataAction,
+          }
+        ]
       },
     ]
-  }
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
-    <RouterProvider router={router} />
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </Provider>
 )

@@ -23,7 +23,10 @@ import {
   FormAdd, 
   action as formDataAction 
 } from './components/formAdd.tsx'
-import { Process } from './components/process.tsx'
+import { 
+  Process,
+  loader as processLoader 
+} from './components/process.tsx'
 import { store } from './store/store.ts'
 import { Unauthorized } from './page/unauthorized.tsx'
 
@@ -45,7 +48,8 @@ const router = createBrowserRouter([
       },
       {
         path: "process",
-        element: <Process />
+        element: <Process />,
+        loader: processLoader
       },
       {
         path: "add",

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import Logo from "../assets/logo.png"
 import { QuestionIcon } from "./icons/question"
 import { ListIcon } from "./icons/list"
-import { Button } from "@material-tailwind/react"
+import { Can } from "../middleware/can"
 
 function SideBar() {
   return (
@@ -23,14 +23,19 @@ function SideBar() {
 							</div>
 						</Link>
 					</nav>
-					{/* <nav className="flex flex-col gap-1 text-base hover:bg-[#154430] px-4 py-1 transition-all cursor-pointer">
-						<Link to={'/dashboard/teste'}>
-							<div className="flex items-center gap-2 px-3 py-[2px]">
-								<ListIcon width="w-5" />
-								<span>Admin</span>
-							</div>
-						</Link>
-					</nav> */}
+					<Can I={['admin']} 
+						children={(
+							<nav className="flex flex-col gap-1 text-base hover:bg-[#154430] px-4 py-1 transition-all cursor-pointer">
+								<Link to={'/dashboard'}>
+									<div className="flex items-center gap-2 px-3 py-[2px]">
+										<ListIcon width="w-5" />
+										<span>Admin</span>
+									</div>
+								</Link>
+							</nav>
+						)}
+					>
+					</Can>
 				</div>
 				<div className="flex flex-col gap-1">
 				</div>

@@ -14,14 +14,12 @@ class LoginController {
 		const loginUserService = await new LoginUserService().execute({ username, password })
 		
 		if (!loginUserService?.status) {
-			res.json({ error: "Credenciais inválidas" })
-			return;
+			return res.json({ error: "Credenciais inválidas" })
 		}
 		
-		const token = jwt.sign({ userId: loginUserService.user?.id }, secretKey)
+		const token = jwt.sign({ userId: loginUserService.user?.id }, secretKey, { expiresIn: '3h' })
 
-		res.status(200).json({ ...loginUserService, token })
-		return;
+		return res.status(200).json({ ...loginUserService, token })
 	}
 }
 

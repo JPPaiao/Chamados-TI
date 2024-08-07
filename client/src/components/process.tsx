@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { PlusCircleIcon } from "./icons/plusCircle"
-import { RootState } from "../store/store"
-import { useSelector } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
+import { store } from "../store/store"
+import { Link, useLoaderData } from "react-router-dom"
 import { TrashIcon } from "./icons/trash"
 import { Modal } from "./modal"
+import { Can } from "../middleware/can"
+import { UserTypes } from "../store/users/userSlice"
 
-interface Process {
+interface ProcessTypes {
 	id: string,
 	title: string,
 	description: string,
@@ -14,37 +15,40 @@ interface Process {
 	sector: string,
 	pdfId: string
 	pdfName: string,
-	URL: string	
+	URL: string
+}
+
+interface LoaderTypes {
+	process: ProcessTypes[],
+	user: UserTypes
+}
+
+async function loader() {
+	const user = store.getState().users.user
+	const response = await fetch('http://localhost:3000/api/procedures', {
+		method: "get",
+		headers: {
+			"Content-Type": "application/json, multipart/form-data, application/pdf",
+			"authorization": user?.token as string
+		},
+	}).then(data => data.json())
+
+	return {
+		process: response ? response : null,
+		...user 
+	}
 }
 
 function Process() {
-	const tokenUser = useSelector((state: RootState) => state.users.user)
-	const navigate = useNavigate()
-	if (!tokenUser || tokenUser === null) {
-    navigate('/')
-  }
-
+	const processLoader = useLoaderData() as LoaderTypes
 	const [modalIsOpen, setModalIsOpen] = useState(false)
 	const [modalAction, setModalAction] = useState(false)
 	const [modalMenssage, setModalMenssage] = useState("")
 	
-	const [processDelet, setProcessDelet] = useState<Process | null>(null)
-	const [process, setProcess] = useState<Process[]>([])
+	const process: ProcessTypes[] | null = processLoader.process
+	const [openCards, setOpenCards] = useState<boolean[]>(Array(process?.length).fill(false))
+	const [processDelet, setProcessDelet] = useState<ProcessTypes | null>(null)
 
-	const [openCards, setOpenCards] = useState<boolean[]>(Array(process.length).fill(false))
-
-	useEffect(() => {
-		fetch('http://localhost:3000/api/procedures', {
-			method: "get",
-			headers: {
-				"Content-Type": "application/json, multipart/form-data, application/pdf",
-				"authorization": tokenUser?.token as string
-			},
-		}).then(data => data.json())
-    .then((data: Process[]) => {
-			setProcess(data)
-		})
-	}, [modalMenssage, process])
 
 	const toggleCard = (index: number) => {
 		const updatedOpenCards = [...openCards]
@@ -59,7 +63,7 @@ function Process() {
 			await fetch(`http://localhost:3000/api/procedures/delete/${idDelete}`, {
 				method: 'delete',
 				headers: {
-					"authorization": tokenUser?.token as string
+					"authorization": processLoader.user?.token as string
 				},
 		}).then(d => d.json())
 
@@ -80,7 +84,7 @@ function Process() {
 		}, 1000)
 	}
 
-	const handleOpenDeleteModal = (process: Process) => {
+	const handleOpenDeleteModal = (process: ProcessTypes) => {
 		setProcessDelet(process)
 		setModalMenssage("Tem certeza que deseja excluir?")
 		setModalAction(true)
@@ -98,14 +102,16 @@ function Process() {
 	return (
 		<div className="flex gap-4 px-6 py-4 flex-wrap items-center justify-center flex-co">
 			<Modal mensagen={modalMenssage} actionType={modalAction} isOpen={modalIsOpen} onCancel={closeModal} onConfirm={toggleDeleteProcess} />
-			<div className="flex justify-end ">
-				<Link to={"/dashboard/add/addProcess"} className="px-3 text-base cursor-pointer hover:bg-green-800 hover:text-white transition-all shadow-md border-green-800 border-2 bg-green-50">
-					Adicionar processo
-				</Link>
+			<div className="flex justify-end">
+				<Can I={['admin']}>
+					<Link to={"/dashboard/add/addProcess"} className="px-3 text-base cursor-pointer hover:bg-green-800 hover:text-white transition-all shadow-md border-green-800 border-2 bg-green-50">
+						Adicionar processo
+					</Link>
+				</Can>
 			</div>
 			<div className="flex gap-2 flex-wrap items-center justify-center w-full">
 				{
-					process.map((process: Process, index: number) => (
+					process?.map((process: ProcessTypes, index: number) => (
 						<div key={process.id} className={`px-3 max-w-96 w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${
 								!openCards[index] ? 'h-auto' : 'h-auto'
 							}`}>
@@ -114,12 +120,14 @@ function Process() {
 										{process.title}
 									</div>
 									<div className="flex gap-2 items-center">
-										<div
-											className="cursor-pointer"
-											onClick={() => handleOpenDeleteModal(process)}
-										>
-											<TrashIcon width="w-5" />
-										</div>
+										<Can I={['admin']}>
+											<div
+												className="cursor-pointer"
+												onClick={() => handleOpenDeleteModal(process)}
+												>
+												<TrashIcon width="w-5" />
+											</div>
+										</Can>
 										<div 
 											className="cursor-pointer"
 											onClick={() => toggleCard(index)}	
@@ -144,4 +152,4 @@ function Process() {
 	)
 }
 
-export { Process }
+export { Process, loader }

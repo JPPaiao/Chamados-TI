@@ -18,7 +18,6 @@ function ProfileMenu() {
     dispatch(removeAuth())
 
     navigate('/')
-    // redirect('/')
   }
 
   return (

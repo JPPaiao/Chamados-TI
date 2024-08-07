@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@material-tailwind/react"
 import { removeAuth } from "../store/users/userSlice"
-import { redirect, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
  
 function ProfileMenu() {

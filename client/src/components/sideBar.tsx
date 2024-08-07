@@ -26,10 +26,10 @@ function SideBar() {
 					<Can I={['admin']} 
 						children={(
 							<nav className="flex flex-col gap-1 text-base hover:bg-[#154430] px-4 py-1 transition-all cursor-pointer">
-								<Link to={'/dashboard'}>
+								<Link to={'/dashboard/admin'}>
 									<div className="flex items-center gap-2 px-3 py-[2px]">
 										<ListIcon width="w-5" />
-										<span>Admin</span>
+										<span>Administração</span>
 									</div>
 								</Link>
 							</nav>

@@ -29,6 +29,7 @@ import {
 } from './components/process.tsx'
 import { store } from './store/store.ts'
 import { Unauthorized } from './page/unauthorized.tsx'
+import { Admin } from './page/admin.tsx'
 
 const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
           }
         ]
       },
+      {
+        path: "admin",
+        element: <Admin />
+      }
     ]
   },
 ])

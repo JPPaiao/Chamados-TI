@@ -56,7 +56,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
 	return new LoginController().handle(req, res)
 })
 
-app.get('/api/user/users', verifyAuth, is(["admin"]), async (req: Request, res: Response) => {
+app.get('/api/users', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new ListUsersController().handle(req, res)
 }) 
 

@@ -1,9 +1,14 @@
 import { decode, verify } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from "express"
 import { config } from 'dotenv'
+import { prismaClient } from 'src/prisma'
 config()
 
-const secretKey: string = process.env.SECRET as string
+interface TokenPayload {
+  userId: string
+}
+
+const secretKey = process.env.SECRET as string
 
 const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
   const tokenHeader: string = req.headers.authorization as string
@@ -12,19 +17,24 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
     if (!tokenHeader) {
       res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
     }
+    
+    const { userId } = verify(tokenHeader, secretKey) as TokenPayload
 
-    verify(tokenHeader, secretKey)
-    const payload = decode(tokenHeader)?.userId as null | string
+    const user = await prismaClient.users.findFirst({
+      where: {
+        id: userId
+      }
+    })
 
-    if (!payload) {
-      return res.status(401).json({ menssage: 'Sem autorização para acessar essa rota' })
+    if (!user) {
+      throw new Error('Erro interno')
     }
-
-    req.body.userId = payload
-
+    
+    req.body.userId = user.id
+    
     next()
   } catch (err) {
-    return res.status(401).end()
+    return res.status(401).json({ erro: "Usuário sem token ou expirado" })
   }
 }
 

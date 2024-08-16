@@ -17,7 +17,7 @@ class LoginController {
 			return res.json({ error: "Credenciais inválidas" })
 		}
 		
-		const token = jwt.sign({ userId: loginUserService.user?.id }, secretKey, { expiresIn: '3h' })
+		const token = jwt.sign({ userId: loginUserService.user?.id }, secretKey, { expiresIn: '6h' })
 
 		return res.status(200).json({ ...loginUserService, token })
 	}

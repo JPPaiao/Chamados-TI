@@ -1,9 +1,11 @@
-function Admin() {
+import { SortableTable } from "../components/sortableTable"
+
+function AdminComponent() {
   return (
     <div>
-      admin
+      <SortableTable />
     </div>
   )
 }
 
-export { Admin }
+export { AdminComponent }

@@ -1,44 +1,75 @@
 import { Link } from "react-router-dom"
 import Logo from "../assets/logo.png"
 import { QuestionIcon } from "./icons/question"
-import { ListIcon } from "./icons/list"
 import { Can } from "../middleware/can"
+import { useState } from "react"
+import { Accordion, AccordionBody, AccordionHeader, Card, List, ListItem, ListItemPrefix } from "@material-tailwind/react"
+import { ChevronDownIcon } from "./icons/chevrnDown"
+import { EnginerIcon } from "./icons/enginer"
+import { UserIcon } from "./icons/user"
 
 function SideBar() {
+	const [open, setOpen] = useState(0)
+ 
+  const handleOpen = (value: number) => {
+    setOpen(open === value ? 0 : value)
+  }
+
   return (
-		<aside className="py-4 flex justify-center bg-[#00693e] text-white overflow-y-auto h-full">
+		<aside className="py-4 flex justify-center bg-[#00693e] text-white overflow-y-auto fixed z-50 h-[100vh]">
 			<div className="w-48 gap-5 flex flex-col">				
 				<div className="px-12 py-1">
 					<Link to={"/dashboard"}>
 						<img className="w-full" src={Logo} alt="Logo Atlantis" />
 					</Link>
 				</div>
-				<div className="flex flex-col ">
-					<h2 className="font-semibold text-lg px-3">Processos</h2>
-					<nav className="flex flex-col gap-1 text-base hover:bg-[#154430] px-4 py-1 transition-all cursor-pointer">
+				<Card placeholder className="h-[calc(100vh)-3rem] w-full bg-transparent shadow-none">
+					<List placeholder className="min-w-[0px] text-white">
 						<Link to={'/dashboard/process'}>
-							<div className="flex items-center gap-2 px-3 py-[2px]">
-								<QuestionIcon width="w-5" />
-								<span>Processos</span>
-							</div>
+							<ListItem placeholder className="text-white">
+								<ListItemPrefix placeholder>
+									<QuestionIcon className="h-5 w-5 " />
+								</ListItemPrefix>
+									Processos
+							</ListItem>
 						</Link>
-					</nav>
-					<Can I={['admin']} 
-						children={(
-							<nav className="flex flex-col gap-1 text-base hover:bg-[#154430] px-4 py-1 transition-all cursor-pointer">
-								<Link to={'/dashboard/admin'}>
-									<div className="flex items-center gap-2 px-3 py-[2px]">
-										<ListIcon width="w-5" />
-										<span>Administração</span>
-									</div>
-								</Link>
-							</nav>
-						)}
-					>
-					</Can>
-				</div>
-				<div className="flex flex-col gap-1">
-				</div>
+						<Can 
+							I={['admin']}
+						>
+							<Accordion placeholder
+								open={open === 1}
+								icon={
+									<ChevronDownIcon
+										className={`mx-auto h-4 w-4 transition-transform ${open === 1 ? "rotate-180" : ""}`}
+									/>
+								}
+							>
+								<ListItem placeholder className="p-0 " selected={open === 1}>
+									<AccordionHeader placeholder onClick={() => handleOpen(1)} className="border-b-0 p-3 text-white">
+										<ListItemPrefix placeholder>
+											<EnginerIcon className="h-5 w-5" />
+										</ListItemPrefix>
+										<h1 className="text-base font-normal">
+											Configuração
+										</h1>
+									</AccordionHeader>
+								</ListItem>
+								<AccordionBody className="py-1 ">
+									<List placeholder className="p-0 text-white">
+										<Link to={'/dashboard/admin/users'}>
+											<ListItem placeholder>
+												<ListItemPrefix placeholder>
+													<UserIcon className="h-4 w-5" />
+												</ListItemPrefix>
+												Usuários
+											</ListItem>
+										</Link>
+									</List>
+								</AccordionBody>
+							</Accordion>
+						</Can>
+					</List>
+				</Card>
 			</div>
 		</aside>
 	)

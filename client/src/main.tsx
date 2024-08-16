@@ -27,9 +27,12 @@ import {
   Process,
   loader as processLoader 
 } from './components/process.tsx'
+import { 
+  SortableTable
+} from './components/sortableTable.tsx'
 import { store } from './store/store.ts'
 import { Unauthorized } from './page/unauthorized.tsx'
-import { Admin } from './page/admin.tsx'
+import { AdminComponent } from './page/admin.tsx'
 
 const router = createBrowserRouter([
   {
@@ -66,10 +69,16 @@ const router = createBrowserRouter([
       },
       {
         path: "admin",
-        element: <Admin />
-      }
+        element: <AdminComponent />,
+        children: [
+          {
+            path: "users",
+            element: <SortableTable />
+          }
+        ]
+      },
     ]
-  },
+  } 
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

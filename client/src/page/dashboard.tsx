@@ -18,9 +18,11 @@ function Dashboard() {
     <div className="text-2xl text-black flex flex-col h-screen">
       <div className="flex flex-wrap flex-1">
       <SideBar />
-        <div className="flex-1 overflow-y-auto max-h-full">
+        <div className="flex-1 overflow-y-auto max-h-full ml-48">
           <Header />
-          <Outlet context={user} />
+          <div className="px-3 py-2">
+            <Outlet context={user} />
+          </div>
         </div>
       </div>
     </div>

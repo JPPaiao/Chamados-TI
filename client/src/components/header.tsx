@@ -1,4 +1,3 @@
-import { UserIcon } from "./icons/user"
 import { ProfileMenu } from "./profile"
 
 function Header() {

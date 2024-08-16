@@ -80,7 +80,7 @@ function Login() {
   
   if (actionData && !actionData.auth && !loginInvalid) {
     setLoginInvalid("Login ou senha invalidos!")
-  } 
+  }
 
   return (
     <div className="w-full h-screen flex gap-x-2 justify-center items-center">
@@ -95,7 +95,7 @@ function Login() {
                 loginInvalid && <p className="text-red-600 text-lg font-semibold">{loginInvalid}</p>
               }
               <div className="text-2xl ">
-                <h1>Atlantis</h1>
+                <h1>Atlantis Terminais</h1>
               </div>
               
               <input type="text" name="username" placeholder="Login" className="border-b-2 border-green-400 px-2 hover:border-green-800 transition-all duration-300 outline-none" />

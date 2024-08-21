@@ -7,13 +7,17 @@ interface ACLTypes {
 }
 
 interface UserPermissions {
-  userId: string; 
-  permissionId: string 
+  userId: string,
+  permissionId: string,
+  permissions?: any,
+  users?: any 
 }
 
 interface UserRoles {
-  userId: string; 
-  roleId: string 
+  userId: string,
+  roleId: string,
+  roles?: any
+  users?: any 
 }
 
 interface UserTypes {
@@ -50,7 +54,7 @@ class CreateUserAccessControllService {
       }
       
       newPermissionFilter.map(async (permission: string) => {
-        await prismaClient.userPermission.create({
+        await prismaClient.userpermission.create({
           data: {
             userId: user.id,
             permissionId: permission
@@ -68,7 +72,7 @@ class CreateUserAccessControllService {
       }
       
       newRoleFilter.map(async (role: string) => {
-        await prismaClient.userRole.create({
+        await prismaClient.userrole.create({
           data: {
             userId: user.id,
             roleId: role
@@ -88,8 +92,16 @@ class CreateUserAccessControllService {
       select: {
         username: true,
         email: true,
-        permissions: true,
-        roles: true,
+        permissions: {
+          select: {
+            permissions: true
+          }
+        },
+        roles: {
+          select: {
+            roles: true
+          }
+        },
       }
     }) as UserTypes
 

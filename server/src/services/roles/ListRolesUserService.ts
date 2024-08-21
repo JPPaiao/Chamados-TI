@@ -17,7 +17,7 @@ class ListRolesUserService {
       include: {
         roles: {
           select: {
-            role: true
+            roles: true
           }
         }
       }

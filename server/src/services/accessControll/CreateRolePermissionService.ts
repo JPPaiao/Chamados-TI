@@ -36,18 +36,18 @@ class CreateRolePermissionService {
           id: roleId
         },
         data: {
-          permission_id: mapPermissionExists
+          permissions: mapPermissionExists
         }
       })
     }
-
+ 
     const roleUpdated = await prismaClient.roles.findFirst({
       where: {
         id: roleId
       },
       include: {
         permissions: true,
-        user: true
+        roles: true
       }
     })
 

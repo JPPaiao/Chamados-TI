@@ -18,17 +18,17 @@ function can(permissionsRoutes: string[]) {
       return res.status(400).json("Usuário não existe no sistema")
     }
 
-    const permissionNames = await prismaClient.userPermission.findMany({
+    const permissionNames = await prismaClient.userpermission.findMany({
       where: {
         userId: user.id,
-        permission: {
+        permissions: {
           name: {
             in: permissionsRoutes
           }
         }  
       },
       select: {
-        permission: {
+        permissions: {
           select: {
             name: true
           }
@@ -36,7 +36,7 @@ function can(permissionsRoutes: string[]) {
       }
     })
 
-    if (!permissionNames[0]?.permission?.name) {
+    if (!permissionNames[0]?.permissions?.name) {
       res.status(401).json("Usuário sem permissão").end()
     } else next()
   }
@@ -59,17 +59,17 @@ function is(rolesRoutes: string[]) {
       return res.status(400).json("Usuário não existe no sistema")
     }
 
-    const rolesNames = await prismaClient.userRole.findMany({
+    const rolesNames = await prismaClient.userrole.findMany({
       where: {
         userId: user.id,
-        role: {
+        roles: {
           name: {
             in: rolesRoutes
           }
         }  
       },
       select: {
-        role: {
+        roles: {
           select: {
             name: true
           }
@@ -77,7 +77,7 @@ function is(rolesRoutes: string[]) {
       }
     })
     
-    if (!rolesNames[0]?.role?.name) {
+    if (!rolesNames[0]?.roles?.name) {
       res.status(401).json("Usuário sem esse acesso").end()
     } else next()
   }

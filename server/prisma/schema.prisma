@@ -7,81 +7,90 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id            String       @id @default(uuid()) 
-  username      String
-  email         String
-  password      String
-  permissions   UserPermission[]
-  roles         UserRole[]
+model permissions {
+  id              String  @id @default(uuid()) @db.VarChar(36)
+  name            String  @db.VarChar(255)
+  description     String? @db.VarChar(255)
+  roles           rolepermission[]
+  users           userpermission[]
 
-  @@map("Users")
+  @@map("permissions")
 }
 
-model Permissions {
-  id          String       @id @default(uuid()) 
-  name        String
-  description String
-  users       UserPermission[]
-  roles       RolePermission[]
+model procedures {
+  id          Int     @id @default(autoincrement())
+  title       String  @db.VarChar(255)
+  description String? @db.VarChar(255)
+  author      String? @db.VarChar(255)
+  sector      String? @db.VarChar(255)
+  pdfName     String? @db.VarChar(255)
+  pdfId       String? @db.VarChar(255)
+  URL         String? @db.VarChar(255)
 
-  @@map("Permissions")
+  @@map("procedures")
 }
 
-model Roles {
-  id          String       @id @default(uuid()) 
-  name        String
-  description String
-  users       UserRole[]
-  permissions RolePermission[]
+model roles {
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  name        String  @db.VarChar(255)
+  description String? @db.VarChar(255)
+  permissions rolepermission[]
+  roles       userrole[]
 
-  @@map("Roles")
+  @@map("roles")
 }
 
-model Procedures {
-  id          Int       @id @default(autoincrement()) 
-  title       String
-  description String
-  author      String
-  sector      String
-  pdfName     String
-  pdfId       String
-  URL         String
+model sectors {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(255)
+  users users[]
 
-  @@map("Procedures")
+  @@map("sectors")
 }
 
-// Tabelas intermediárias para relações many-to-many
+model users {
+  id              String @id @default(uuid()) @db.VarChar(36)
+  username        String @db.VarChar(255)
+  email           String @db.VarChar(255)
+  password        String @db.VarChar(255)
+  sectorId        Int?
+  permissions     userpermission[]
+  roles           userrole[]
+  sector          sectors?         @relation(fields: [sectorId], references: [id])
 
-model UserPermission {
-  userId        String      
-  permissionId  String  
-  user          Users       @relation(fields: [userId], references: [id])
-  permission    Permissions @relation(fields: [permissionId], references: [id])
-
-  @@id([userId, permissionId])
-  @@index([userId])
-  @@index([permissionId])
+  @@index([sectorId], map: "sectorId")
+  @@map("users")
 }
 
-model UserRole {
-  userId   String 
-  roleId   String 
-  user     Users  @relation(fields: [userId], references: [id])
-  role     Roles  @relation(fields: [roleId], references: [id])
-
-  @@id([userId, roleId])
-  @@index([userId])
-  @@index([roleId])
-}
-
-model RolePermission {
-  roleId        String      
-  permissionId  String     
-  role          Roles       @relation(fields: [roleId], references: [id])
-  permission    Permissions @relation(fields: [permissionId], references: [id])
+model rolepermission {
+  roleId       String @db.VarChar(36)
+  permissionId String @db.VarChar(36)
+  permissions  permissions @relation(fields: [permissionId], references: [id])
+  roles        roles       @relation(fields: [roleId], references: [id])
 
   @@id([roleId, permissionId])
-  @@index([roleId])
-  @@index([permissionId])
+  @@index([permissionId], map: "permissionId")
+  @@map("rolepermission")
+}
+
+model userpermission {
+  userId       String @db.VarChar(36)
+  permissionId String @db.VarChar(36)
+  permissions  permissions @relation(fields: [permissionId], references: [id])
+  users        users       @relation(fields: [userId], references: [id])
+
+  @@id([userId, permissionId])
+  @@index([permissionId], map: "permissionId")
+  @@map("userpermission")
+}
+
+model userrole {
+  userId String @db.VarChar(36)
+  roleId String @db.VarChar(36)
+  roles  roles  @relation(fields: [roleId], references: [id])
+  users  users  @relation(fields: [userId], references: [id])
+
+  @@id([userId, roleId])
+  @@index([roleId], map: "roleId")
+  @@map("userrole")
 }

@@ -33,14 +33,14 @@ class LoginUserService {
 					username: username
 				},
 				include: {
-					permissions: {
-						select: {
-							permission: true
-						}
-					},
 					roles: {
 						select: {
-							role: true
+							roles: true
+						}
+					},
+					permissions: {
+						select: {
+							permissions: true
 						}
 					}
 				}

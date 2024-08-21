@@ -8,15 +8,15 @@ async function verifyRoles(req: Request, res: Response) {
     res.status(401).json("Sem acesso")
   }
 
-  const rolesUser = await prismaClient.userRole.findMany({
+  const rolesUser = await prismaClient.userrole.findMany({
     where: {
       userId: userId
     },
     select: {
-      role: true
+      roles: true
     }
   })
-  const fillRoles = rolesUser.map(r => r.role)
+  const fillRoles = rolesUser.map(r => r.roles)
 
   if (!fillRoles || fillRoles.length <= 0) {
     res.status(401).json("Usuário sem papeis")

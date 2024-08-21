@@ -11,7 +11,8 @@ class LoginController {
 	async handle(req: Request, res: Response) {
 		const { username, password }: LoginProps = req.body
 		const secretKey = process.env.SECRET as string
-		const loginUserService = await new LoginUserService().execute({ username, password })
+		const service = new LoginUserService()
+		const loginUserService = await service.execute({ username, password })
 		
 		if (!loginUserService?.status) {
 			return res.json({ error: "Credenciais inválidas" })

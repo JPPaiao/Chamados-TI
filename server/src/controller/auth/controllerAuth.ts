@@ -19,7 +19,6 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
     }
     
     const { userId } = verify(tokenHeader, secretKey) as TokenPayload
-
     const user = await prismaClient.users.findFirst({
       where: {
         id: userId

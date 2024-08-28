@@ -143,11 +143,13 @@ function Process() {
 									</div>
 								</div>
 								{openCards[index] && (
-									<div className="text-base py-1">
-										{process.description}
+									<div className="text-base py-1 text-left">
 										<div>
-											<a href={process.URL} target="_blank" >{process.pdfName}</a>
+											{process.description}
 										</div>
+										<span className="text-xs underline text-blue-700">
+											<a href={process.URL} target="_blank" >{process.pdfName}</a>
+										</span>
 									</div>
 								)}
 						</div>			

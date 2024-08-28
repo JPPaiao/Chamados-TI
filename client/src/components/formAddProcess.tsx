@@ -21,14 +21,14 @@ async function action({ request, params }) {
     body: formDataToSend,
     headers: {
       "authorization": user?.token as string
-    },
+    }
   })
   .then(d => d.json())
 
   return redirect('/dashboard/process')
 }
 
-function FormAdd() {
+function AddProcess() {
   const user = useSelector((state: RootState) => state.users.user)
   const submit = useSubmit()
   const [process, setProcess] = useState<Process>({
@@ -60,8 +60,8 @@ function FormAdd() {
       formData.append('pdfName', process.pdfName)
       formData.append('pdf', process.pdf as File)
     }
-
-    submit(formData, { method: 'POST', action: "/dashboard/add/addProcess", encType: "multipart/form-data"})
+    
+    submit(formData, { method: 'POST', action: "/dashboard/add/addProcess", encType: "multipart/form-data" })
   }
 
   return (
@@ -74,4 +74,4 @@ function FormAdd() {
   )
 }
 
-export { FormAdd, action }
+export { AddProcess, action }

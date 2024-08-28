@@ -1,15 +1,14 @@
 import { prismaClient } from "src/prisma"
 
 interface CreateUserProps {
-  id?: string,
   username: string,
   email: string,
   password: string,
-
+  sectorId?: number | null
 }
 
 class CreateUserService {
-  async execute({ username, email, password }: CreateUserProps) {
+  async execute({ username, email, password, sectorId }: CreateUserProps) {
 
     if (!username || !email || !password) {
       throw new Error("Preencha todos os campos")
@@ -19,7 +18,8 @@ class CreateUserService {
       data: {
         username,
         email,
-        password
+        password,
+        sectorId
       }
     })
 

@@ -1,15 +1,18 @@
 import { prismaClient } from "src/prisma"
 
-class DeleteUserService {
-  async execute(idUser: string) {
+interface DeleteProps {
+  id: string
+}
 
-    if (!idUser) {
+class DeleteUserService {
+  async execute({ id }: DeleteProps) {
+    if (!id) {
       throw new Error("Preencha todos os campos")
     }
 
     const user = await prismaClient.users.delete({
       where: {
-        id: idUser
+        id: id
       }
     })
 

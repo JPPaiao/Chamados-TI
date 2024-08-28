@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardHeader,
@@ -8,36 +7,21 @@ import {
   CardBody,
   Chip,
   CardFooter,
-  Tabs,
-  TabsHeader,
-  Tab,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogHeader,
+  DialogFooter,
 } from "@material-tailwind/react"
-import { RootState } from "../store/store"
+import { RootState, store } from "../store/store"
 import { ChangeEvent, useEffect, useState } from "react"
-import { useSelector } from "react-redux"
 import { PencilIcon } from "./icons/pencil"
 import { ChevronUpDownIcon } from "./icons/chevronupdown"
 import { MagnifyingGlassIcon } from "./icons/magnifyingglassIcon"
-
-const TABS = [
-  {
-    label: "All",
-    value: "all",
-  },
-  {
-    label: "Monitored",
-    value: "monitored",
-  },
-  {
-    label: "Unmonitored",
-    value: "unmonitored",
-  },
-]
+import { TrashIcon } from "./icons/trash"
+import { Form, Link, useLoaderData } from "react-router-dom"
  
 const TABLE_HEAD = ["Nome", "Email", "Status", "Setor", ""]
- 
 
 interface LoaderUsers {
   id: string,
@@ -49,10 +33,19 @@ interface LoaderUsers {
   status: boolean
 }
 
+async function loader() {
+  const user = store.getState()
+
+  return user
+}
+
 function SortableTable() {
-  const user = useSelector((state: RootState) => state.users)
+  const user = useLoaderData() as RootState
   const [tableUsers, setTableUsers] = useState<LoaderUsers[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [size, setSize] = useState<string | undefined>(undefined)
+  const [idDelet, setIdDelet] = useState<string | null>(null)
+  const handleOpen = (value: string | undefined) => setSize(value)
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
@@ -63,7 +56,7 @@ function SortableTable() {
       const response = await fetch('http://localhost:3000/api/users', {
         method: "get",
         headers: {
-          "authorization": user?.user?.token as string
+          "authorization": user?.users?.user?.token  as string
         }
       }).then(d => d.json())
 
@@ -72,26 +65,77 @@ function SortableTable() {
 
     usersEffect()
   }, [user])
+  
+  const handleDeletUser = async () => {
+    if (idDelet) {
+      const response = await fetch("http://localhost:3000/api/user/delete", {
+        method: "DELETE",
+        body: JSON.stringify({ id: idDelet }),
+        headers: {
+          "authorization": user?.users?.user?.token as string,
+          "Content-Type": "application/json"
+        }
+      }).then(d => d.json())
+    }
 
-  const filteredTable = tableUsers.filter((item) =>
+    setTableUsers((prevUsers) => prevUsers.filter((user) => user.id !== idDelet))
+    setIdDelet(null)
+  }
+
+  const filteredTable = tableUsers?.filter((item) =>
     item.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.setor?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
-    <Card placeholder className="w-full px-4 py-5 overflow-auto mt-2 shadow-none border">
+    <Card placeholder className="w-full px-4 py-5 overflow-auto mt-2 shadow-none border-none">
+      <Dialog
+        placeholder
+        open={
+          !!size ||
+          size === "xs" ||
+          size === "sm" ||
+          size === "md"
+        }
+        size={size || "sm"}
+        handler={handleOpen}
+      >
+        <DialogHeader placeholder>Tem certeza que deseja excluir esse usuário</DialogHeader>
+        <DialogFooter placeholder>
+          <Form method="DELETE" >
+            <Button
+              placeholder
+              variant="text"
+              color="red"
+              onClick={() => handleOpen(undefined)}
+              className="mr-1"
+            >
+              <span>Cancelar</span>
+            </Button>
+            <Button
+              placeholder
+              variant="gradient"
+              color="green"
+              onClick={() => {
+                handleOpen(undefined)
+                handleDeletUser()}
+              }
+            >
+              <span>Confirmar</span>
+            </Button>
+          </Form>
+        </DialogFooter>
+      </Dialog>
       <CardHeader placeholder floated={false} shadow={false} className="rounded-none ">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row pt-1">
-          <Tabs value="all" className="w-full md:w-max">
-            <TabsHeader placeholder>
-              {TABS.map(({ label, value }) => (
-                <Tab placeholder key={value} value={value}>
-                  &nbsp;&nbsp;{label}&nbsp;&nbsp;
-                </Tab>
-              ))}
-            </TabsHeader>
-          </Tabs>
+          <div>
+            <Link to={'/dashboard/admin/users/add'}>
+              <Button placeholder variant="outlined" size="sm">
+                  Novo usuário
+              </Button>
+            </Link>
+          </div>
           <div className="w-full md:w-72">
             <Input crossOrigin
               label="Search"
@@ -126,13 +170,13 @@ function SortableTable() {
           </thead>
           <tbody>
             {filteredTable.map(
-              ({ username, email, setor, status }, index) => {
+              ({ username, email, setor, status, id }, index) => {
                 const isLast = index === tableUsers.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
                 return (
-                  <tr key={username}>
+                  <tr key={id}>
                     <td className={classes}>
                       <div className="flex items-center gap-3">
                         <div className="flex flex-col">
@@ -178,14 +222,23 @@ function SortableTable() {
                       </Typography>
                     </td>
                     <td className={classes}>
-                      <Tooltip content="Edit User">
+                      <Tooltip content="Editar">
                         <IconButton placeholder variant="text">
                           <PencilIcon className="h-4 w-4" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip content="Deletar">
+                        <IconButton placeholder variant="text" 
+                        onClick={() => {
+                            setIdDelet(id)
+                            handleOpen("sm")
+                          }}>
+                          <TrashIcon className="h-4 w-4" />
+                        </IconButton>
+                      </Tooltip>
                     </td>
                   </tr>
-                );
+                )
               },
             )}
           </tbody>
@@ -208,4 +261,4 @@ function SortableTable() {
   )
 }
 
-export { SortableTable }
+export { SortableTable, loader }

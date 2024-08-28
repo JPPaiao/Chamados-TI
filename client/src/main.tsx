@@ -20,19 +20,24 @@ import {
   loader as privateRoutesLoader
 } from './router/privateRoutres.tsx'
 import { 
-  FormAdd, 
+  AddProcess, 
   action as formDataAction 
-} from './components/formAdd.tsx'
+} from './components/formAddProcess.tsx'
 import { 
   Process,
   loader as processLoader 
 } from './components/process.tsx'
 import { 
-  SortableTable
+  SortableTable,
+  loader as sortableTableLoader
 } from './components/sortableTable.tsx'
 import { store } from './store/store.ts'
 import { Unauthorized } from './page/unauthorized.tsx'
 import { AdminComponent } from './page/admin.tsx'
+import { 
+  AddUsers,
+  action as addUsersAction
+} from './components/formAddUsers.tsx'
 
 const router = createBrowserRouter([
   {
@@ -62,7 +67,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: "addProcess",
-            element: <FormAdd />,
+            element: <AddProcess />,
             action: formDataAction,
           }
         ]
@@ -73,7 +78,13 @@ const router = createBrowserRouter([
         children: [
           {
             path: "users",
-            element: <SortableTable />
+            element: <SortableTable />,
+            loader: sortableTableLoader
+          },
+          {
+            path: "users/add",
+            element: <AddUsers />,
+            action: addUsersAction
           }
         ]
       },

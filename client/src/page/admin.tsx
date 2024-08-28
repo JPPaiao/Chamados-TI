@@ -1,9 +1,9 @@
-import { SortableTable } from "../components/sortableTable"
+import { Outlet } from "react-router"
 
 function AdminComponent() {
   return (
     <div>
-      <SortableTable />
+      <Outlet />
     </div>
   )
 }

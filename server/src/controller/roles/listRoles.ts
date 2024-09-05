@@ -5,8 +5,6 @@ class ListRolesController {
   async handle(req: Request, res: Response) {
     const rolesService = new ListRolesService()
     const response = await rolesService.execute()
-    
-    console.log(response)
 
     if (!response) {
       res.status(400).json({ erro: "Papeis não encontrados" })

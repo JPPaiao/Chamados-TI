@@ -18,6 +18,7 @@ import { can, is } from "./middleware/permissions"
 import { ListRolesController } from "./controller/roles/listRoles"
 import { ListRolesUserController } from "./controller/roles/listRolesUser"
 import { verifyRoles } from "./controller/auth/verifyRoles"
+import { DeleteRolesController } from "./controller/roles/deleteRoles"
 
 const app = express()
 app.use(express.json())
@@ -50,6 +51,10 @@ app.get('/api/roles/user', verifyAuth, async (req: Request, res: Response) => {
 	return verifyRoles(req, res)
 })
 
+app.delete('/api/roles/delete', verifyAuth, async (req: Request, res: Response) => {
+	return new DeleteRolesController().handle(req, res)
+})
+
 
 // USERS -----------------------------
 app.post('/api/auth/login', async (req: Request, res: Response) => {
@@ -60,22 +65,24 @@ app.get('/api/users', verifyAuth, is(['admin']), async (req: Request, res: Respo
 	return new ListUsersController().handle(req, res)
 }) 
 
-app.post('/api/user/create', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
+app.post('/api/users/create', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new CreateUserController().handle(req, res)
 })
 
-app.put('/api/user/update', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
+app.put('/api/users/update', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new UpdateUserController().handle(req, res)
 })
 
-app.delete('/api/user/delete', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
+app.delete('/api/users/delete', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
 	return new DeleteUserController().handle(req, res)
 })
 
-app.get('/api/user/roles', verifyAuth, async (req: Request, res: Response) => {
+app.get('/api/users/roles', verifyAuth, async (req: Request, res: Response) => {
 	return new ListRolesUserController().handle(req, res)
 })
 
+
+// SECTORS ------------------------------
 
 
 // PROCEDURES ---------------------------

@@ -7,6 +7,8 @@ import { Accordion, AccordionBody, AccordionHeader, Card, List, ListItem, ListIt
 import { ChevronDownIcon } from "./icons/chevrnDown"
 import { EnginerIcon } from "./icons/enginer"
 import { UserIcon } from "./icons/user"
+import { ClipboardDocumentCheck } from "./icons/clipboardDocumentCheck"
+import { HomeIcon } from "./icons/home"
 
 function SideBar() {
 	const [open, setOpen] = useState(0)
@@ -25,6 +27,14 @@ function SideBar() {
 				</div>
 				<Card placeholder className="h-[calc(100vh)-3rem] w-full bg-transparent shadow-none">
 					<List placeholder className="min-w-[0px] text-white">
+						<Link to={'/dashboard'}>
+							<ListItem placeholder className="text-white">
+								<ListItemPrefix placeholder>
+									<HomeIcon className="h-5 w-5" />
+								</ListItemPrefix>
+									Home
+							</ListItem>
+						</Link>
 						<Link to={'/dashboard/process'}>
 							<ListItem placeholder className="text-white">
 								<ListItemPrefix placeholder>
@@ -33,9 +43,7 @@ function SideBar() {
 									Processos
 							</ListItem>
 						</Link>
-						<Can 
-							I={['admin']}
-						>
+						<Can I={['admin']} >
 							<Accordion placeholder
 								open={open === 1}
 								icon={
@@ -62,6 +70,16 @@ function SideBar() {
 													<UserIcon className="h-4 w-5" />
 												</ListItemPrefix>
 												Usuários
+											</ListItem>
+										</Link>
+									</List>
+									<List placeholder className="p-0 text-white">
+										<Link to={'/dashboard/admin/papeis'}>
+											<ListItem placeholder>
+												<ListItemPrefix placeholder>
+													<ClipboardDocumentCheck className="h-4 w-5" />
+												</ListItemPrefix>
+												Papeis
 											</ListItem>
 										</Link>
 									</List>

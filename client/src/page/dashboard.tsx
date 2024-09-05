@@ -5,7 +5,7 @@ import { store } from "../store/store"
 import { userLogged } from "../store/users/userSlice"
 
 async function loader() {
-  userLogged()
+  await userLogged()
   const userAuth = store.getState().users
 
   return !userAuth.auth ? userAuth.user : null

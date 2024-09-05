@@ -4,6 +4,7 @@ import { Form, redirect, useActionData, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
 import { userAuth, userLogged } from "../store/users/userSlice"
 import { store } from "../store/store"
+import { httpClientFactory, HttpRequest } from "../services/server"
 
 interface ActionProps {
   auth: boolean,
@@ -36,21 +37,23 @@ const action = async ({ request }) => {
     username: username,
     password: password
   }
-
+  
   if (body.password && body.password) {
-    const data = await fetch('http://localhost:3000/api/auth/login', {
+    const datas: HttpRequest = {
       method: "post",
+      url: "auth/login",
+      body: JSON.stringify(body),
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(body) 
-    })
-    .then(res => res.json()) as AuthLogin
+    }
 
-    if (data.token) {
+    const reponse = await httpClientFactory().request(datas) as AuthLogin
+
+    if (reponse.token) {
       return  {
         auth: true,
-        data: data
+        data: reponse
       }
     }
   }

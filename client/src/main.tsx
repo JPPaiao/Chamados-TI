@@ -31,13 +31,21 @@ import {
   SortableTable,
   loader as sortableTableLoader
 } from './components/sortableTable.tsx'
-import { store } from './store/store.ts'
-import { Unauthorized } from './page/unauthorized.tsx'
-import { AdminComponent } from './page/admin.tsx'
 import { 
   AddUsers,
   action as addUsersAction
 } from './components/formAddUsers.tsx'
+import { 
+  Roles,
+  loader as rolesLoader
+} from './page/admin/roles.tsx'
+import { 
+  AddRoles,
+  action as addRolesAction
+} from './components/formAddRoles.tsx'
+import { store } from './store/store.ts'
+import { Unauthorized } from './page/unauthorized.tsx'
+import { AdminComponent } from './page/admin/admin.tsx'
 
 const router = createBrowserRouter([
   {
@@ -85,7 +93,17 @@ const router = createBrowserRouter([
             path: "users/add",
             element: <AddUsers />,
             action: addUsersAction
-          }
+          },
+          {
+            path: "papeis",
+            element: <Roles />,
+            loader: rolesLoader
+          },
+          {
+            path: "papeis/add",
+            element: <AddRoles />,
+            action: addRolesAction
+          },
         ]
       },
     ]

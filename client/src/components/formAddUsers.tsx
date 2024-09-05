@@ -1,7 +1,7 @@
 import { Input } from "@material-tailwind/react"
 import { Form, redirect, useSubmit } from "react-router-dom"
-import { store } from "../store/store"
 import { FormEvent, useState } from "react"
+import { httpClientFactory, HttpRequest } from "../services/server"
 
 interface UserType {
   username: string | null,
@@ -10,20 +10,20 @@ interface UserType {
   sector?: string | null
 }
 
-async function action({ request, params }) {
-  const user = store.getState().users.user
+async function action({ request }) {
   const formDataToSend = await request.formData()
   const data = Object.fromEntries(formDataToSend)
 
-  const resonse = await fetch('http://localhost:3000/api/user/create', {
-    method: 'post',
+  const datas: HttpRequest = {
+    method: "post",
+    url: 'users/create',
     body: JSON.stringify(data),
     headers: {
-      "authorization": user?.token as string,
       "Content-Type": "application/json"
     }
-  })
-  .then(d => d.json())
+  }
+  
+  await httpClientFactory().request(datas)
 
   return redirect('/dashboard/admin/users')
 }

@@ -28,9 +28,9 @@ import {
   loader as processLoader 
 } from './components/process.tsx'
 import { 
-  SortableTable,
-  loader as sortableTableLoader
-} from './components/sortableTable.tsx'
+  Users,
+  loader as usersLoader
+} from './page/admin/users.tsx'
 import { 
   AddUsers,
   action as addUsersAction
@@ -86,8 +86,8 @@ const router = createBrowserRouter([
         children: [
           {
             path: "users",
-            element: <SortableTable />,
-            loader: sortableTableLoader
+            element: <Users />,
+            loader: usersLoader
           },
           {
             path: "users/add",

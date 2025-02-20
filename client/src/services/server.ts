@@ -19,10 +19,10 @@ class FetchHttpClientAdapter implements HttpClient {
     let response: any
 
     try {
-      response = await fetch(`http://localhost:3000/api/${data.url}`, {
+      response = await fetch(`http://localhost:3001/api/${data.url}`, {
         method: data.method,
         headers: {
-          "authorization": user?.token  as string,
+          "authorization": `Bearer ${user?.token}`,
           ...data?.headers
         },
         body: data.body

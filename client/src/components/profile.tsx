@@ -6,7 +6,7 @@ import {
   Avatar,
   Typography,
 } from "@material-tailwind/react"
-import { removeAuth } from "../store/users/userSlice"
+import { logout } from "../store/users/userSlice"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
  
@@ -15,7 +15,7 @@ function ProfileMenu() {
   const navigate = useNavigate()
 
   const handleSignOut = () => {
-    dispatch(removeAuth())
+    dispatch(logout())
 
     navigate('/')
   }

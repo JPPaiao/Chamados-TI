@@ -8,11 +8,11 @@ datasource db {
 }
 
 model permissions {
-  id              String  @id @default(uuid()) @db.VarChar(36)
-  name            String  @db.VarChar(255)
-  description     String? @db.VarChar(255)
-  roles           rolepermission[]
-  users           userpermission[]
+  id          String           @id @default(uuid()) @db.VarChar(36)
+  name        String           @db.VarChar(255)
+  description String?          @db.VarChar(255)
+  roles       rolepermission[]
+  users       userpermission[]
 
   @@map("permissions")
 }
@@ -31,9 +31,9 @@ model procedures {
 }
 
 model roles {
-  id          String  @id @default(uuid()) @db.VarChar(36)
-  name        String  @db.VarChar(255)
-  description String? @db.VarChar(255)
+  id          String           @id @default(uuid()) @db.VarChar(36)
+  name        String           @db.VarChar(255)
+  description String?          @db.VarChar(255)
   permissions rolepermission[]
   roles       userrole[]
 
@@ -41,30 +41,43 @@ model roles {
 }
 
 model sectors {
-  id    Int    @id @default(autoincrement())
-  name  String @db.VarChar(255)
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(255)
   users users[]
 
   @@map("sectors")
 }
 
-model users {
-  id              String @id @default(uuid()) @db.VarChar(36)
-  username        String @db.VarChar(255)
-  email           String @db.VarChar(255)
-  password        String @db.VarChar(255)
-  sectorId        Int?
-  permissions     userpermission[]
-  roles           userrole[]
-  sector          sectors?         @relation(fields: [sectorId], references: [id])
+model refreshtokens {
+  id       String @id @default(uuid()) @db.VarChar(36)
+  expresIn Int
 
-  @@index([sectorId], map: "sectorId")
+  userId String @unique
+  user   users  @relation(fields: [userId], references: [id])
+
+  @@map("refreshtokens")
+}
+
+model users {
+  id          String           @id @default(uuid()) @db.VarChar(36)
+  username    String           @db.VarChar(255)
+  email       String           @db.VarChar(255)
+  password    String           @db.VarChar(255)
+  permissions userpermission[]
+  roles       userrole[]
+
+  sectorId Int?
+  sector   sectors? @relation(fields: [sectorId], references: [id])
+
+  refreshTokenId String?        @unique
+  refreshtokens  refreshtokens?
+
   @@map("users")
 }
 
 model rolepermission {
-  roleId       String @db.VarChar(36)
-  permissionId String @db.VarChar(36)
+  roleId       String      @db.VarChar(36)
+  permissionId String      @db.VarChar(36)
   permissions  permissions @relation(fields: [permissionId], references: [id])
   roles        roles       @relation(fields: [roleId], references: [id])
 
@@ -74,8 +87,8 @@ model rolepermission {
 }
 
 model userpermission {
-  userId       String @db.VarChar(36)
-  permissionId String @db.VarChar(36)
+  userId       String      @db.VarChar(36)
+  permissionId String      @db.VarChar(36)
   permissions  permissions @relation(fields: [permissionId], references: [id])
   users        users       @relation(fields: [userId], references: [id])
 

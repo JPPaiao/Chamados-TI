@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { store } from "../store";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { httpClientFactory, HttpRequest } from "../../services/server"
 
 interface RolesFetch {
   id: string,
@@ -12,15 +12,14 @@ interface RolesState {
 }
 
 export const fecthRolesUser = createAsyncThunk("roles/fetchRolesUser", async () => {
-  const user = store.getState().users.user
-  const response = await fetch('http://localhost:3000/api/roles/user', {
-    method: 'get',
-    headers: {
-      "authorization": user?.token as string
-    }
-  })
+  const datas: HttpRequest = {
+    method: "get",
+    url: `roles/user`,
+  }
+    
+  const response = await httpClientFactory().request(datas)
 
-  return response.json()
+  return response
 })
 
 const initialState: RolesState = {

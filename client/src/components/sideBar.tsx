@@ -26,9 +26,9 @@ function SideBar() {
 					</Link>
 				</div>
 				<Card placeholder className="h-[calc(100vh)-3rem] w-full bg-transparent shadow-none">
-					<List placeholder className="min-w-[0px] text-white">
+					<List placeholder className="min-w-[0px] text-white p-0">
 						<Link to={'/dashboard'}>
-							<ListItem placeholder className="text-white">
+							<ListItem placeholder className="text-white rounded-none">
 								<ListItemPrefix placeholder>
 									<HomeIcon className="h-5 w-5" />
 								</ListItemPrefix>
@@ -36,14 +36,14 @@ function SideBar() {
 							</ListItem>
 						</Link>
 						<Link to={'/dashboard/process'}>
-							<ListItem placeholder className="text-white">
+							<ListItem placeholder className="text-white rounded-none">
 								<ListItemPrefix placeholder>
 									<QuestionIcon className="h-5 w-5 " />
 								</ListItemPrefix>
 									Processos
 							</ListItem>
 						</Link>
-						<Can I={['admin']} >
+						<Can I={['Admin']} >
 							<Accordion placeholder
 								open={open === 1}
 								icon={
@@ -52,7 +52,7 @@ function SideBar() {
 									/>
 								}
 							>
-								<ListItem placeholder className="p-0 " selected={open === 1}>
+								<ListItem placeholder className="p-0 bg-blue-gray-50/0 rounded-none" selected={open === 1}>
 									<AccordionHeader placeholder onClick={() => handleOpen(1)} className="border-b-0 p-3 text-white">
 										<ListItemPrefix placeholder>
 											<EnginerIcon className="h-5 w-5" />
@@ -65,7 +65,7 @@ function SideBar() {
 								<AccordionBody className="py-1 ">
 									<List placeholder className="p-0 text-white">
 										<Link to={'/dashboard/admin/users'}>
-											<ListItem placeholder>
+											<ListItem placeholder className="rounded-none">
 												<ListItemPrefix placeholder>
 													<UserIcon className="h-4 w-5" />
 												</ListItemPrefix>
@@ -75,7 +75,7 @@ function SideBar() {
 									</List>
 									<List placeholder className="p-0 text-white">
 										<Link to={'/dashboard/admin/papeis'}>
-											<ListItem placeholder>
+											<ListItem placeholder className="rounded-none">
 												<ListItemPrefix placeholder>
 													<ClipboardDocumentCheck className="h-4 w-5" />
 												</ListItemPrefix>

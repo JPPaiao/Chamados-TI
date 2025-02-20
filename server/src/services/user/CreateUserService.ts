@@ -4,11 +4,12 @@ interface CreateUserProps {
   username: string,
   email: string,
   password: string,
-  sectorId?: number | null
+  sectorId?: number | null,
+  refreshTokenId?: string | null
 }
 
 class CreateUserService {
-  async execute({ username, email, password, sectorId }: CreateUserProps) {
+  async execute({ username, email, password, sectorId, refreshTokenId }: CreateUserProps) {
 
     if (!username || !email || !password) {
       throw new Error("Preencha todos os campos")
@@ -19,7 +20,8 @@ class CreateUserService {
         username,
         email,
         password,
-        sectorId
+        sectorId,
+        refreshTokenId,
       }
     })
 

@@ -1,18 +1,33 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-export interface UserTypes {
+export interface AuthUser {
   token: string,
+  refreshToken: {
+    id: string,
+    expresIn: number,
+    userId: string
+  }
+  status: boolean,
+  user: UserTypes 
+}
+
+export interface UserTypes {
+  // token: string,
   email: string,
   username: string,
   id: string,
+  sectorId?: number,
+  refreshToken?: string,
+  // roles: Array<object>,
+  // permissions: Array<object>
 }
 
 interface InitialStateType {
-  user: UserTypes | null,
+  user: AuthUser | null,
   auth: boolean
 }
 
-const getUserLocalStorage = (): UserTypes | null => {
+const getUserLocalStorage = (): AuthUser | null => {
   const user = localStorage.getItem('userToken')
   if (user) {
     return JSON.parse(user)
@@ -29,14 +44,14 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    userAuth: (state, action: PayloadAction<UserTypes>) => {
+    login: (state, action: PayloadAction<AuthUser>) => {
       state.user = action.payload
       state.auth = true
 
       localStorage.setItem('userToken', JSON.stringify(action.payload))
     },
 
-    removeAuth: state => {
+    logout: state => {
       state.user = null
       state.auth = false
       
@@ -56,5 +71,5 @@ const userSlice = createSlice({
   }
 })
 
-export const { removeAuth, userAuth, userLogged } = userSlice.actions
+export const { logout, login, userLogged } = userSlice.actions
 export default userSlice.reducer

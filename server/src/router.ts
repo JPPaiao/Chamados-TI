@@ -1,7 +1,7 @@
 import cors from "cors"
 import multer from "multer"
 import express, { Request, Response } from "express"
-import { verifyAuth } from "./controller/auth/controllerAuth"
+import { verifyAuth } from "./controller/auth/AuthenticController"
 import { CreateUserController } from "./controller/users/createUser"
 import { ListUsersController } from "./controller/users/listUsers"
 import { UpdateUserController } from "./controller/users/updateUser"
@@ -16,9 +16,9 @@ import { CreateUserAccessControlContorller } from "./controller/accessCrontrol/C
 import { CreateRolePermissionController } from "./controller/accessCrontrol/CreateRolePermissionController"
 import { can, is } from "./middleware/permissions"
 import { ListRolesController } from "./controller/roles/listRoles"
-import { ListRolesUserController } from "./controller/roles/listRolesUser"
 import { verifyRoles } from "./controller/auth/verifyRoles"
 import { DeleteRolesController } from "./controller/roles/deleteRoles"
+import { RefreshTokenController } from "./controller/refreshToken/RefreshTokenController"
 
 const app = express()
 app.use(express.json())
@@ -65,7 +65,7 @@ app.get('/api/users', verifyAuth, is(['admin']), async (req: Request, res: Respo
 	return new ListUsersController().handle(req, res)
 }) 
 
-app.post('/api/users/create', verifyAuth, is(['admin']), async (req: Request, res: Response) => {
+app.post('/api/users/create',  async (req: Request, res: Response) => {
 	return new CreateUserController().handle(req, res)
 })
 
@@ -77,10 +77,9 @@ app.delete('/api/users/delete', verifyAuth, is(['admin']), async (req: Request, 
 	return new DeleteUserController().handle(req, res)
 })
 
-app.get('/api/users/roles', verifyAuth, async (req: Request, res: Response) => {
-	return new ListRolesUserController().handle(req, res)
+app.post('/api/refresh-token', async (req: Request, res: Response) => {
+	return new RefreshTokenController().handle(req, res)
 })
-
 
 // SECTORS ------------------------------
 

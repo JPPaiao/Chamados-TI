@@ -41,6 +41,7 @@ function Users() {
 
   const [size, setSize] = useState<string | undefined>(undefined)
   const handleOpen = (value: string | undefined) => setSize(value)
+  const [menssage, setMenssage] = useState<string | null>(null)
 
   const handleDelet = async () => {
     const datas: HttpRequest = {
@@ -67,18 +68,23 @@ function Users() {
     setUsers(responseFetchAPI)
   }
 
+  const openDialog = (user: LoaderUsers) => {
+    setMenssage(`Tem certeza que deseja excluir o usuário "${user?.username}?"`)
+    handleOpen('sm')
+  }
+
   const datasUser = {
     add: 'users',
     heads: TABLE,
     body: users,
     filterSearch: filterSearch,
     select: setSelectorUser,
-    openModal: handleOpen,
+    openModal: openDialog,
   }
 
   return (
     <div className="w-full px-4 py-5 overflow-auto mt-2 shadow-none border-none">
-      <DialogModal handleOpen={handleOpen} size={size} onClickButton={handleDelet} />
+      <DialogModal handleOpen={handleOpen} size={size} onClickButton={handleDelet} menssage={menssage} />
       <ListTable<LoaderUsers> datas={datasUser} /> 
     </div>
   )

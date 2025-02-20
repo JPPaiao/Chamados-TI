@@ -16,7 +16,7 @@ async function action({ request, params }) {
   const user = store.getState().users.user
   const formDataToSend = await request.formData()
 
-  await fetch('http://localhost:3000/api/procedures/create', {
+  await fetch('http://localhost:3001/api/procedures/create', {
     method: 'post',
     body: formDataToSend,
     headers: {

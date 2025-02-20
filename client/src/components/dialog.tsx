@@ -1,6 +1,13 @@
 import { Button, Dialog, DialogFooter, DialogHeader } from "@material-tailwind/react"
 
-function DialogModal({ onClickButton, size, handleOpen }) {
+interface DialogProps {
+  onClickButton: () => void, 
+  handleOpen: (size: string | undefined) => void, 
+  size: string | undefined, 
+  menssage?: string | null
+}
+
+function DialogModal({ onClickButton, size, handleOpen, menssage }: DialogProps) {
   return (
     <Dialog
       placeholder
@@ -13,7 +20,11 @@ function DialogModal({ onClickButton, size, handleOpen }) {
       size={size || "sm"}
       handler={handleOpen}
       >
-      <DialogHeader placeholder>Tem certeza que deseja excluir esse usuário</DialogHeader>
+      <DialogHeader placeholder>
+        {
+          menssage
+        }
+      </DialogHeader>
       <DialogFooter placeholder>
         <form  >
           <Button

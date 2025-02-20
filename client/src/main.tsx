@@ -12,8 +12,7 @@ import {
   loader as loginLoader 
 } from './page/login.tsx'
 import { 
-  Dashboard,
-  loader as dashboardLoader
+  Dashboard
 } from './page/dashboard.tsx'
 import { 
   PrivateRoutes,
@@ -45,7 +44,7 @@ import {
 } from './components/formAddRoles.tsx'
 import { store } from './store/store.ts'
 import { Unauthorized } from './page/unauthorized.tsx'
-import { AdminComponent } from './page/admin/admin.tsx'
+import { AuthenticRouter } from './router/authenticRouter.tsx'
 
 const router = createBrowserRouter([
   {
@@ -56,8 +55,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
-    loader: dashboardLoader,
+    element: (
+      <AuthenticRouter>
+        <Dashboard />
+      </AuthenticRouter>
+    ),
     children: [
       {
         path: "unauthorized",
@@ -70,7 +72,7 @@ const router = createBrowserRouter([
       },
       {
         path: "add",
-        element: <PrivateRoutes role={['admin', 'gerentes']} />,
+        element: <PrivateRoutes role={['Admin']} />,
         loader: privateRoutesLoader,
         children: [
           {
@@ -82,7 +84,8 @@ const router = createBrowserRouter([
       },
       {
         path: "admin",
-        element: <AdminComponent />,
+        element: <PrivateRoutes role={['Admin']} />,
+        loader: privateRoutesLoader,
         children: [
           {
             path: "users",

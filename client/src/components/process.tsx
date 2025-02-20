@@ -6,6 +6,8 @@ import { TrashIcon } from "./icons/trash"
 import { Modal } from "./modal"
 import { Can } from "../middleware/can"
 import { userLogged, UserTypes } from "../store/users/userSlice"
+import { httpClientFactory, HttpRequest } from "../services/server"
+import { DialogModal } from "./dialog"
 const url = import.meta.env.SERVER_API
 
 interface ProcessTypes {
@@ -27,34 +29,40 @@ interface LoaderTypes {
 async function loader() {
 	userLogged()
 	const user = store.getState().users
-	const response = await fetch(`http://localhost:3000/api/procedures`, {
-		method: "get",
-		headers: {
-			"Content-Type": "application/json, multipart/form-data, application/pdf",
-			"authorization": user?.user?.token as string
-		},
-	}).then(data => data.json())
-
+	
 	if (!user.auth) {
 		return redirect('/')
 	}
+	
+	const datas: HttpRequest = {
+		method: "get",
+		url: "procedures",
+		headers: {
+			"Content-Type": "application/json, multipart/form-data, application/pdf"
+			}
+		}
+    
+  const response = await httpClientFactory().request(datas)
 
 	return {
 		process: response ? response : null,
-		...user 
+		...user
 	}
 }
 
 function Process() {
 	const processLoader = useLoaderData() as LoaderTypes
-	const [modalIsOpen, setModalIsOpen] = useState(false)
-	const [modalAction, setModalAction] = useState(false)
-	const [modalMenssage, setModalMenssage] = useState("")
+	const [allProcess, setAllProcess] = useState<ProcessTypes[]>(processLoader.process)
+
+	console.log(allProcess)
+
+	const [size, setSize] = useState<string | undefined>(undefined)
+  const handleOpen = (value: string | undefined) => setSize(value)
+	const [menssage, setMenssage] = useState<string | null>(null)
 	
 	const process: ProcessTypes[] | null = processLoader.process
 	const [openCards, setOpenCards] = useState<boolean[]>(Array(process?.length).fill(false))
 	const [processDelet, setProcessDelet] = useState<ProcessTypes | null>(null)
-
 
 	const toggleCard = (index: number) => {
 		const updatedOpenCards = [...openCards]
@@ -65,51 +73,39 @@ function Process() {
 	const toggleDeleteProcess = async () => {
 		const idDelete = processDelet?.id
 
-		if (idDelete === null) return closeModal()
-			await fetch(`http://localhost:3000/api/procedures/delete/${idDelete}`, {
-				method: 'delete',
-				headers: {
-					"authorization": processLoader.user?.token as string
-				},
-		}).then(d => d.json())
-
-		handleOpenSucessoModal(`Processo ${processDelet?.title}, deletado com sucesso!`)
-
-		setTimeout(() => {
-			closeModal()
-		}, 2000)
+		if (idDelete) {
+			const datas: HttpRequest = {
+				method: "delete",
+				url: `procedures/delete/${idDelete}`,
+				}
+				
+			await httpClientFactory().request(datas)
+		}
+		
+		handleReload()
 	}
 
-	const handleOpenSucessoModal = (menssage: string) => {
-		setModalMenssage(menssage)
-		setModalAction(false)
-		openModal()
-
-		setTimeout(() => {
-			closeModal()
-		}, 1000)
-	}
+	const handleReload = async () => {
+    const datas: HttpRequest = {
+      method: "get",
+      url: "procedures"
+    }
+    
+    const responseFetchAPI = await httpClientFactory().request(datas) as ProcessTypes[]
+    setAllProcess(responseFetchAPI)
+  }
 
 	const handleOpenDeleteModal = (process: ProcessTypes) => {
 		setProcessDelet(process)
-		setModalMenssage("Tem certeza que deseja excluir?")
-		setModalAction(true)
-		openModal()
-	}
-
-	const openModal = () => {
-		setModalIsOpen(true) 
-	}
-
-	const closeModal = () => {
-		setModalIsOpen(false)
+		setMenssage(`Tem certeza que deseja excluir o processo "${process.title}?"`)
+		handleOpen('sm')
 	}
 
 	return (
 		<div className="flex gap-4 px-6 py-4 flex-wrap items-center justify-center flex-col">
-			<Modal mensagen={modalMenssage} actionType={modalAction} isOpen={modalIsOpen} onCancel={closeModal} onConfirm={toggleDeleteProcess} />
+			<DialogModal handleOpen={handleOpen} size={size} onClickButton={toggleDeleteProcess} menssage={menssage} />
 			<div className="flex justify-end">
-				<Can I={['admin']}>
+				<Can I={['Admin']}>
 					<Link to={"/dashboard/add/addProcess"} className="px-3 text-base cursor-pointer hover:bg-green-800 hover:text-white transition-all shadow-md border-green-800 border-2 bg-green-50">
 						Adicionar processo
 					</Link>
@@ -117,7 +113,7 @@ function Process() {
 			</div>
 			<div className="flex gap-2 flex-wrap items-center justify-center w-full">
 				{
-					process?.map((process: ProcessTypes, index: number) => (
+					allProcess?.map((process: ProcessTypes, index: number) => (
 						<div key={process.id} className={`px-3 max-w-[340px] w-full flex flex-col items-center justify-between shadow-md border-green-800 border-2 bg-green-50 ${
 								!openCards[index] ? 'h-auto' : 'h-auto'
 							}`}>

@@ -11,14 +11,16 @@ interface TokenPayload {
 const secretKey = process.env.SECRET as string
 
 const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
-  const tokenHeader: string = req.headers.authorization as string
+  const tokenHeader = req.headers.authorization as string | undefined
   
+  if (!tokenHeader) {
+    res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
+  }
+  
+  const [, token] = tokenHeader?.split(" ") as string[]
+
   try {
-    if (!tokenHeader) {
-      res.status(401).json({ menssage: 'Usuário sem autorização para esta ação' })
-    }
-    
-    const { userId } = verify(tokenHeader, secretKey) as TokenPayload
+    const { userId } = verify(token, secretKey) as TokenPayload
     const user = await prismaClient.users.findFirst({
       where: {
         id: userId
@@ -30,7 +32,6 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
     }
     
     req.body.userId = user.id
-    
     next()
   } catch (err) {
     return res.status(401).json({ erro: "Usuário sem token ou expirado" })

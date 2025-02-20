@@ -2,14 +2,9 @@
 import { useState } from "react"
 import { Form, redirect, useActionData, useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
-import { userAuth, userLogged } from "../store/users/userSlice"
+import { login, userLogged, AuthUser } from "../store/users/userSlice"
 import { store } from "../store/store"
 import { httpClientFactory, HttpRequest } from "../services/server"
-
-interface ActionProps {
-  auth: boolean,
-  data: AuthLogin
-}
 
 interface AuthLogin {
   token: string
@@ -51,10 +46,7 @@ const action = async ({ request }) => {
     const reponse = await httpClientFactory().request(datas) as AuthLogin
 
     if (reponse.token) {
-      return  {
-        auth: true,
-        data: reponse
-      }
+      return reponse
     }
   }
   return {
@@ -64,35 +56,30 @@ const action = async ({ request }) => {
 
 function Login() {
   const [loginInvalid, setLoginInvalid] = useState("")
-  const actionData = useActionData() as ActionProps
+  const actionData = useActionData() as AuthUser
   const dispatch = useDispatch()
   const navigate = useNavigate()
-
-  if (actionData && actionData.auth) {
+  
+  if (actionData && actionData.status) {
     dispatch(
-      userAuth({
-        token: actionData.data.token,
-        email: actionData.data.user.email,
-        username: actionData.data.user.username,
-        id: actionData.data.user.id
-      })
+      login(actionData)
     )
 
     navigate("/dashboard")
   }
   
-  if (actionData && !actionData.auth && !loginInvalid) {
+  if (actionData && !actionData.status && !loginInvalid) {
     setLoginInvalid("Login ou senha invalidos!")
   }
 
   return (
-    <div className="w-full h-screen flex gap-x-2 justify-center items-center">
+    <div className="w-full h-screen flex gap-x-2 justify-center items-center bg-green-800">
       <div className="w-full h-screen  md:block hidden">
         <img src="https://images.pexels.com/photos/672460/pexels-photo-672460.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="" className="w-full h-full object-cover"/>
         
       </div>
       <div className="flex justify-center items-center w-full py-5 px-7 sm:px-11">
-        <div className="max-w-[500px] m-auto w-full bg-green-800 px-7 py-14">
+        <div className="max-w-[500px] m-auto w-full px-7 py-14">
           <Form method="post" className="flex flex-col gap-6 bg-white px-7 py-6 max-w-96 m-auto">
               {
                 loginInvalid && <p className="text-red-600 text-lg font-semibold">{loginInvalid}</p>

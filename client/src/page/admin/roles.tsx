@@ -35,6 +35,7 @@ function Roles() {
 
   const [size, setSize] = useState<string | undefined>(undefined)
   const handleOpen = (value: string | undefined) => setSize(value)
+  const [menssage, setMenssage] = useState<string | null>(null)
 
   const handleDelet = async () => {
     const datas: HttpRequest = {
@@ -61,18 +62,23 @@ function Roles() {
     setRoles(responseFetchAPI)
   }
 
+  const openDialog = (role: RolesProps) => {
+    setMenssage(`Tem certeza que deseja excluir o papel "${role?.name}?"`)
+    handleOpen('sm')
+  }
+
   const datasRoles = {
     heads: HEADS,
     body: roles,
     add: 'papeis',
     filterSearch: filterSearch,
     select: setSelectorRoles,
-    openModal: handleOpen
+    openModal: openDialog
   }
   
   return (
     <div className="px-4 py-5">
-      <DialogModal handleOpen={handleOpen} size={size} onClickButton={handleDelet} />
+      <DialogModal handleOpen={handleOpen} size={size} onClickButton={handleDelet} menssage={menssage} />
       <ListTable<RolesProps> datas={datasRoles}  />
     </div>
   )

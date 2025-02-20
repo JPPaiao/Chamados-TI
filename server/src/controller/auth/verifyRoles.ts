@@ -18,10 +18,6 @@ async function verifyRoles(req: Request, res: Response) {
   })
   const fillRoles = rolesUser.map(r => r.roles)
 
-  if (!fillRoles || fillRoles.length <= 0) {
-    res.status(401).json("Usuário sem papeis")
-  }
-
   res.status(200).json(fillRoles)
 }
 

@@ -12,7 +12,7 @@ interface ListTableProps<T> {
   add: string
   filterSearch?: string[],
   select: (user: T) => void,
-  openModal: (size: string) => void
+  openModal: (user: T) => void
 }
 
 function ListTable<T>({ datas }, arg: T) {
@@ -134,7 +134,7 @@ function ListTable<T>({ datas }, arg: T) {
                           <IconButton placeholder variant="text" 
                           onClick={() => {
                               select(datas)
-                              openModal("sm")
+                              openModal(datas)
                             }}>
                             <TrashIcon className="h-4 w-4" />
                           </IconButton>

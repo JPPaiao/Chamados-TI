@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux"
-import { Navigate, Outlet, useLoaderData } from "react-router-dom"
+import { Navigate, Outlet, redirect, useLoaderData } from "react-router-dom"
 import { RootState, store } from "../store/store"
+import { httpClientFactory, HttpRequest } from "../services/server"
 
 interface PrivateRoutesProps {
   role?: string[],
@@ -14,14 +15,16 @@ interface RolesUser {
 
 async function loader() {
   const user = store.getState().users.user
-  const rolesUser = await fetch('http://localhost:3000/api/roles/user', {
-    method: 'get',
-    headers: {
-      "authorization": user?.token as string
-    },
-  }).then(r => r.json()) as RolesUser[]
 
-  const rolesName = rolesUser.map(r => r.name)
+  if (!user) return redirect('/')
+
+  const datas: HttpRequest = {
+		method: "get",
+		url: "roles/user",
+	}
+
+  const response = await httpClientFactory().request(datas) as RolesUser[]
+  const rolesName = response.map(r => r.name)
 
   return rolesName
 }
